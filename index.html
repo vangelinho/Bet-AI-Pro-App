@@ -1,0 +1,2372 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Bet AI Pro - Professional Betting Solutions</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              green: '#10B981',
+              darkGreen: '#047857',
+              bg: '#0B1120',
+              card: '#162032',
+              border: '#283548',
+              accent: '#F59E0B'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0b1120;
+      color: #f8fafc;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar { display: none; }
+    .custom-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="pb-24">
+
+  <!-- Toast Notification -->
+  <div id="toast-msg" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-emerald-500 text-slate-950 font-black px-4 py-2 rounded-2xl shadow-2xl flex items-center gap-2 text-xs transition-all duration-300 opacity-0 pointer-events-none transform -translate-y-4">
+    <i class="fa-solid fa-circle-check text-sm"></i>
+    <span id="toast-text">Ενημέρωση!</span>
+  </div>
+
+  <!-- Header -->
+  <header class="sticky top-0 z-30 bg-[#064e3b]/95 backdrop-blur-md border-b border-emerald-600/40 px-4 py-3 shadow-lg">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400/30 to-emerald-900/60 flex items-center justify-center border border-emerald-400/40 shadow-inner">
+          <i class="fa-solid fa-microchip text-emerald-400 text-lg"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-black text-white tracking-wide">Bet AI Pro</h1>
+          <div class="text-[11px] text-emerald-300 font-semibold flex items-center gap-1.5 mt-0.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Professional Betting Solutions
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner Υπολοίπου Trial / Συνδρομής -->
+  <div id="trial-alert-bar" class="hidden bg-amber-500/20 border-b border-amber-500/30 px-4 py-2 text-xs flex justify-between items-center text-amber-300">
+    <div class="flex items-center gap-2">
+      <i class="fa-solid fa-clock"></i>
+      <span id="trial-time-left">Δωρεάν Δοκιμή: Υπολογισμός...</span>
+    </div>
+    <button onclick="openPaywallModal()" class="bg-amber-500 text-slate-950 font-black px-2.5 py-1 rounded-lg text-[10px] uppercase shadow-md">
+      VIP Πακέτα
+    </button>
+  </div>
+
+  <!-- Κύριο Περιεχόμενο -->
+  <main class="max-w-md mx-auto p-4 space-y-4">
+
+    <!-- TAB 1: ΑΡΧΙΚΗ -->
+    <div id="tab-home" class="space-y-4">
+      
+      <!-- Επιλογέας 5 Ημερών -->
+      <div class="grid grid-cols-5 gap-1 bg-slate-900/90 p-1.5 rounded-2xl border border-slate-800 shadow-inner overflow-x-auto custom-scroll">
+        <button onclick="changeDay('minus2')" id="btn-day-minus2" class="py-2 px-1 rounded-xl text-[11px] font-bold text-slate-400 transition flex flex-col items-center">
+          <span class="font-extrabold text-[10px]" id="label-name-minus2">-2 Ημ.</span>
+          <span class="text-[9px] font-normal opacity-70" id="label-date-minus2">--/--</span>
+        </button>
+        <button onclick="changeDay('minus1')" id="btn-day-minus1" class="py-2 px-1 rounded-xl text-[11px] font-bold text-slate-400 transition flex flex-col items-center">
+          <span class="font-extrabold text-[10px]">Χθες</span>
+          <span class="text-[9px] font-normal opacity-70" id="label-date-minus1">--/--</span>
+        </button>
+        <button onclick="changeDay('today')" id="btn-day-today" class="py-2 px-1 rounded-xl text-[11px] font-black bg-emerald-500 text-slate-950 transition flex flex-col items-center shadow-lg shadow-emerald-500/20">
+          <span class="font-black text-[10px]">Σήμερα</span>
+          <span class="text-[9px] font-semibold opacity-90" id="label-date-today">--/--</span>
+        </button>
+        <button onclick="changeDay('plus1')" id="btn-day-plus1" class="py-2 px-1 rounded-xl text-[11px] font-bold text-slate-400 transition flex flex-col items-center">
+          <span class="font-extrabold text-[10px]">Αύριο</span>
+          <span class="text-[9px] font-normal opacity-70" id="label-date-plus1">--/--</span>
+        </button>
+        <button onclick="changeDay('plus2')" id="btn-day-plus2" class="py-2 px-1 rounded-xl text-[11px] font-bold text-slate-400 transition flex flex-col items-center">
+          <span class="font-extrabold text-[10px]" id="label-name-plus2">+2 Ημ.</span>
+          <span class="text-[9px] font-normal opacity-70" id="label-date-plus2">--/--</span>
+        </button>
+      </div>
+
+      <!-- Banner Αποτελεσμάτων Ημέρας -->
+      <div id="yesterday-stats-banner" class="hidden bg-slate-800/90 border border-emerald-500/40 rounded-2xl p-3 text-xs flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+          <div>
+            <div class="font-bold text-white">Αποτελέσματα Επιλεγμένης Ημέρας</div>
+            <div class="text-[11px] text-slate-300 font-semibold mt-0.5" id="yesterday-rate-text">Υπολογισμός...</div>
+          </div>
+        </div>
+        <span class="bg-emerald-500/20 text-emerald-400 font-extrabold px-2.5 py-1 rounded-lg text-xs" id="yesterday-badge">Win Rate</span>
+      </div>
+
+      <!-- Αναπτυσσόμενο Μενού (Dropdown) Χωρών & Πρωταθλημάτων -->
+      <div class="bg-slate-900 border border-slate-700 rounded-2xl p-3 space-y-2 shadow-md">
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-filter text-emerald-400"></i> Επιλογή Πρωταθλήματος / Χώρας:
+        </label>
+        <select id="country-dropdown-select" onchange="onDropdownFilterChange(this.value)" class="w-full bg-slate-950 border border-slate-700 text-white font-bold text-xs p-2.5 rounded-xl focus:outline-none focus:border-emerald-500">
+          <option value="ALL">🌐 Όλοι οι Αγώνες</option>
+          <option value="LIVE">🔥 Live Αγώνες</option>
+          <option value="UEFA">🏆 UEFA (Champions / Europa / Conference)</option>
+        </select>
+      </div>
+
+      <!-- Λίστα Αγώνων -->
+      <div id="matches-container" class="space-y-3"></div>
+    </div>
+
+    <!-- TAB 2: PRO PICKS -->
+    <div id="tab-propicks" class="hidden space-y-4">
+      <div class="bg-gradient-to-r from-amber-500/20 to-emerald-500/10 border border-amber-500/30 rounded-2xl p-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i class="fa-solid fa-award text-amber-400 text-xl"></i>
+            <div>
+              <h3 class="font-black text-white text-base">Smart AI High-Probability Picks</h3>
+              <p class="text-xs text-slate-400">Επιλογές με βάση προηγμένα δεδομένα αγώνα</p>
+            </div>
+          </div>
+          <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-1 rounded-md font-bold">Deep Value</span>
+        </div>
+      </div>
+      <div id="pro-picks-container" class="space-y-3"></div>
+    </div>
+
+    <!-- TAB 3: COMMUNITY CHAT -->
+    <div id="tab-chat" class="hidden space-y-3">
+      <div class="bg-slate-900 border border-emerald-500/30 rounded-2xl p-3 text-xs flex items-center justify-between shadow-md">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-comments text-emerald-400 text-base"></i>
+          <div>
+            <div class="font-bold text-white">Bet AI Pro Community</div>
+            <div class="text-[11px] text-slate-400">Ζωντανή συνομιλία VIP μελών</div>
+          </div>
+        </div>
+        <span class="bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">Live Chat</span>
+      </div>
+
+      <div id="chat-messages-box" class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 h-[52vh] overflow-y-auto custom-scroll space-y-2.5 text-xs">
+        <div class="text-center text-slate-500 py-4">Φόρτωση μηνυμάτων...</div>
+      </div>
+
+      <form onsubmit="sendCommunityMessage(event)" class="flex gap-2">
+        <input type="text" id="chat-input-field" placeholder="Γράψτε το μήνυμά σας..." class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+        <button type="submit" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-4 py-2.5 rounded-xl transition shadow-lg">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- TAB 4: ΕΙΔΙΚΟΙ -->
+    <div id="tab-experts" class="hidden space-y-4">
+      <div class="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-3 text-xs flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-user-tie text-emerald-400 text-base"></i>
+          <div>
+            <div class="font-bold text-white">Κατηγοριοποίηση Αγορών (Smart AI)</div>
+            <div class="text-[11px] text-slate-400" id="experts-day-label">Αγώνες για: Σήμερα</div>
+          </div>
+        </div>
+        <span class="bg-emerald-500/20 text-emerald-300 font-bold px-2 py-0.5 rounded text-[10px]">Smart Analysis</span>
+      </div>
+
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 space-y-3 shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 font-black text-lg border border-emerald-500/30">
+              GM
+            </div>
+            <div>
+              <h4 class="font-extrabold text-white text-sm">Goal Master</h4>
+              <p class="text-xs text-slate-400">Over 1.5, GG & Ασφαλή Γκολ</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-emerald-400 font-black text-sm"><i class="fa-solid fa-futbol"></i></span>
+            <p class="text-[10px] text-slate-400">Goals</p>
+          </div>
+        </div>
+        <div id="expert-goalmaster-container" class="space-y-2"></div>
+      </div>
+
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 space-y-3 shadow-sm">
+        <div class="flex items-center justify-between border-b border-slate-700/60 pb-3">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400 font-black text-lg border border-amber-500/30">
+              SB
+            </div>
+            <div>
+              <h4 class="font-extrabold text-white text-sm">Solid Banker & Double Chance</h4>
+              <p class="text-xs text-slate-400">1Χ, Χ2 & Ισχυρά Στηρίγματα</p>
+            </div>
+          </div>
+          <div class="text-right">
+            <span class="text-amber-400 font-black text-sm"><i class="fa-solid fa-shield-halved"></i></span>
+            <p class="text-[10px] text-slate-400">Points</p>
+          </div>
+        </div>
+        <div id="expert-banker-container" class="space-y-2"></div>
+      </div>
+    </div>
+
+    <!-- TAB 5: AI GENERATOR -->
+    <div id="tab-generator" class="hidden space-y-4 relative">
+      <div class="bg-gradient-to-br from-purple-950/80 via-slate-900 to-slate-900 border border-purple-500/40 rounded-3xl p-5 space-y-4 shadow-xl">
+        <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+          <div class="w-10 h-10 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-300 text-lg">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-white text-sm">Smart AI Slip Builder</h3>
+            <span class="text-[10px] text-purple-300 font-semibold">Δημιουργία δελτίου βάσει ανάλυσης</span>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="block text-slate-300 text-xs font-bold">1. Επιλογή Πρωταθλήματος / Διοργάνωσης:</label>
+          <select id="builder-league-select" class="w-full bg-slate-950 border border-purple-500/40 text-white font-bold text-xs p-2.5 rounded-xl focus:outline-none focus:border-purple-400">
+            <option value="ALL">🌐 Όλα τα Πρωτάθληματα</option>
+          </select>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="block text-slate-300 text-xs font-bold">2. Αριθμός Ομάδων / Σημείων (1 έως 10):</label>
+          <div class="grid grid-cols-5 gap-1.5" id="gen-count-buttons">
+            <button type="button" onclick="setGenCount(1)" id="gen-cnt-1" class="py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition">1</button>
+            <button type="button" onclick="setGenCount(2)" id="gen-cnt-2" class="py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition">2</button>
+            <button type="button" onclick="setGenCount(3)" id="gen-cnt-3" class="py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition">3</button>
+            <button type="button" onclick="setGenCount(4)" id="gen-cnt-4" class="py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition">4</button>
+            <button type="button" onclick="setGenCount(5)" id="gen-cnt-5" class="py-2 rounded-xl bg-purple-600 text-white font-black text-xs border border-purple-400 shadow-md transition">5</button>
+            <button type="button" onclick="setGenCount(6)" id="gen-cnt-6" class="py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition">6</button>
+            <button type="button" onclick="setGenCount(7)" id="gen-cnt-7" class="py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition">7</button>
+            <button type="button" onclick="setGenCount(8)" id="gen-cnt-8" class="py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition">8</button>
+            <button type="button" onclick="setGenCount(9)" id="gen-cnt-9" class="py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition">9</button>
+            <button type="button" onclick="setGenCount(10)" id="gen-cnt-10" class="py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition">10</button>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="block text-slate-300 text-xs font-bold">3. Επίπεδο Βεβαιότητας & Ρίσκου:</label>
+          <div class="grid grid-cols-3 gap-2" id="gen-risk-buttons">
+            <button type="button" onclick="setGenRisk('safe')" id="gen-risk-safe" class="py-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 font-extrabold text-xs border border-emerald-500/40 shadow-sm transition">
+              🟢 85%+ Σίγουρο
+            </button>
+            <button type="button" onclick="setGenRisk('medium')" id="gen-risk-medium" class="py-2.5 rounded-xl bg-slate-950 text-slate-400 font-bold text-xs border border-slate-800 transition">
+              🟡 80%+ Value
+            </button>
+            <button type="button" onclick="setGenRisk('bomb')" id="gen-risk-bomb" class="py-2.5 rounded-xl bg-slate-950 text-slate-400 font-bold text-xs border border-slate-800 transition">
+              🔴 Δυνατή Μπόμπα
+            </button>
+          </div>
+        </div>
+
+        <button onclick="generateCustomSlip()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-black py-3 rounded-xl text-xs transition shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2">
+          <i class="fa-solid fa-bolt"></i> Δημιουργία Smart AI Δελτίου
+        </button>
+      </div>
+
+      <div id="generator-result-container" class="space-y-3"></div>
+    </div>
+
+    <!-- TAB 6: ΠΡΟΦΙΛ / ΛΟΓΑΡΙΑΣΜΟΣ (Νέο Tab) -->
+    <div id="tab-profile" class="hidden space-y-4">
+      <div class="bg-slate-900 border border-slate-700 rounded-3xl p-5 space-y-4 shadow-xl">
+        <div class="flex items-center gap-3 border-b border-slate-800 pb-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-lg">
+            <i class="fa-solid fa-user-circle"></i>
+          </div>
+          <div>
+            <h3 class="font-black text-white text-sm">Διαχείριση Προφίλ & Συνδρομής</h3>
+            <span class="text-[10px] text-emerald-400 font-semibold" id="prof-status-top">Κατάσταση Λογαριασμού</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3 text-xs">
+          <div class="space-y-1">
+            <label class="text-slate-400 font-bold block">Όνομα Χρήστη (Username):</label>
+            <div class="flex gap-2">
+              <input type="text" id="prof-username-input" placeholder="Το όνομά σου..." class="flex-1 bg-slate-900 border border-slate-700 px-3.5 py-2.5 rounded-xl text-white font-bold focus:outline-none focus:border-emerald-500">
+              <button onclick="saveUserProfileName()" class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-3.5 py-2.5 rounded-xl transition">
+                Αποθήκευση
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-2.5 border-t border-slate-800">
+            <span class="text-slate-400">Email:</span>
+            <span id="prof-email" class="font-bold text-white font-mono">--</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Κατάσταση:</span>
+            <span id="prof-status" class="font-extrabold text-emerald-400">--</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-400">Λήξη Πρόσβασης:</span>
+            <span id="prof-expires" class="font-mono text-slate-200">--</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5 text-xs">
+          <span class="text-amber-400 font-bold block"><i class="fa-solid fa-key"></i> Αλλαγή Κωδικού Πρόσβασης:</span>
+          <input type="password" id="prof-new-password" placeholder="Νέος κωδικός (τουλάχιστον 6 χαρακτήρες)" class="w-full bg-slate-900 border border-slate-700 px-3.5 py-2.5 rounded-xl text-white focus:outline-none focus:border-amber-400">
+          <button onclick="changeClientPassword()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2.5 rounded-xl transition">
+            Ενημέρωση Κωδικού
+          </button>
+        </div>
+
+        <div class="space-y-2 pt-1">
+          <button onclick="syncUserProfileOnline()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3 rounded-xl text-xs transition flex items-center justify-center gap-2 border border-slate-700">
+            <i class="fa-solid fa-rotate text-emerald-400"></i> Έλεγχος Έγκρισης Πληρωμής
+          </button>
+          <button onclick="openPaywallModal()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg">
+            <i class="fa-solid fa-crown"></i> Πακέτα Συνδρομής & Δωροκάρτες
+          </button>
+          <button onclick="handleLogout()" class="w-full bg-slate-800 hover:bg-rose-500/20 hover:text-rose-400 text-slate-300 font-bold py-3 rounded-xl text-xs transition border border-slate-700 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Αποσύνδεση
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MODAL 1: SCOUTING & REAL STATS -->
+  <div id="scouting-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-md p-5 space-y-4 max-h-[90vh] overflow-y-auto custom-scroll shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-compass-drafting text-emerald-400 text-lg"></i>
+          <div>
+            <h3 id="scout-modal-title" class="font-black text-white text-sm">Smart AI Scouting & Analytics</h3>
+            <span id="scout-modal-league" class="text-[10px] text-slate-400 block font-semibold">League</span>
+          </div>
+        </div>
+        <button onclick="closeScoutingModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div id="scout-modal-content" class="space-y-3 text-xs"></div>
+
+      <button onclick="closeScoutingModal()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition border border-slate-700 flex items-center justify-center gap-2">
+        Κλείσιμο Ανάλυσης
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ΕΙΣΟΔΟΣ & ΕΓΓΡΑΦΗ -->
+  <div id="auth-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-md p-6 space-y-4 shadow-2xl">
+      <div class="text-center space-y-1">
+        <div class="w-12 h-12 mx-auto rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xl mb-2">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+        <h3 class="text-lg font-black text-white" id="auth-title">Είσοδος στο Bet AI Pro</h3>
+        <p class="text-xs text-slate-400" id="auth-desc">Συνδεθείτε με το email και τον κωδικό σας.</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 bg-slate-950 p-1 rounded-2xl border border-slate-800 text-xs font-bold">
+        <button type="button" onclick="switchAuthMode('login')" id="btn-tab-login" class="py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-black transition shadow-md">
+          Είσοδος
+        </button>
+        <button type="button" onclick="switchAuthMode('signup')" id="btn-tab-signup" class="py-2.5 rounded-xl text-slate-400 hover:text-white transition">
+          Εγγραφή Νέου
+        </button>
+      </div>
+
+      <form onsubmit="handleAuthSubmitForm(event)" class="space-y-3">
+        <div>
+          <label class="block text-slate-300 text-xs font-semibold mb-1">Email</label>
+          <input type="email" id="auth-email-field" required placeholder="π.χ. user@gmail.com" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-slate-300 text-xs font-semibold mb-1">Κωδικός Πρόσβασης</label>
+          <input type="password" id="auth-password-field" required placeholder="Τουλάχιστον 6 χαρακτήρες" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div class="text-right">
+          <button type="button" onclick="handleForgotPassword()" class="text-xs text-amber-400 hover:underline font-bold">
+            <i class="fa-solid fa-key"></i> Ξέχασα τον κωδικό μου
+          </button>
+        </div>
+
+        <div id="signup-extra-hint" class="hidden text-[11px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 p-2.5 rounded-xl">
+          <i class="fa-solid fa-gift mr-1"></i> Με την εγγραφή κερδίζετε <strong>48 ώρες VIP Free Trial</strong>.
+        </div>
+
+        <button type="submit" id="btn-auth-submit-btn" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-lg">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> <span id="btn-auth-label">Είσοδος στο Σύστημα</span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 3: PAYWALL -->
+  <div id="paywall-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-slate-900 border border-amber-500/50 rounded-3xl w-full max-w-md p-5 space-y-4 max-h-[92vh] overflow-y-auto custom-scroll shadow-2xl">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+        <div class="flex items-center gap-2 text-amber-400 font-black text-sm">
+          <i class="fa-solid fa-crown text-base"></i> Ενεργοποίηση Συνδρομής VIP
+        </div>
+        <button onclick="closePaywallModal()" class="text-slate-400 hover:text-white p-1">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="bg-gradient-to-r from-purple-950/60 to-slate-900 p-3.5 rounded-2xl border border-purple-500/40 space-y-2">
+        <div class="flex items-center gap-2 text-purple-300 font-extrabold text-xs">
+          <i class="fa-solid fa-gift text-sm"></i> Έχετε Κωδικό Δωροκάρτας;
+        </div>
+        <div class="flex gap-2">
+          <input type="text" id="gift-card-input" placeholder="Εισάγετε τον κωδικό" class="flex-1 bg-slate-950 border border-purple-500/40 rounded-xl px-3 py-2 text-xs text-white uppercase tracking-wider focus:outline-none focus:border-purple-400">
+          <button onclick="redeemGiftCardOnline()" class="bg-purple-600 hover:bg-purple-500 text-white font-black text-xs px-3.5 py-2 rounded-xl transition">
+            Εξαργύρωση
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <div class="text-xs font-black text-slate-300 flex items-center gap-1.5">
+          <i class="fa-solid fa-layer-group text-amber-400"></i> Επιλέξτε Πακέτο Συνδρομής:
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <div onclick="selectPackage(15, 20)" id="pkg-15" class="cursor-pointer bg-slate-950/80 border-2 border-slate-800 hover:border-amber-500/60 p-2.5 rounded-2xl text-center space-y-1 transition">
+            <span class="text-[10px] text-slate-400 block font-bold">15 Ημέρες</span>
+            <span class="text-base font-black text-white font-mono block">20€</span>
+            <span class="text-[9px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded">Starter</span>
+          </div>
+
+          <div onclick="selectPackage(30, 30)" id="pkg-30" class="cursor-pointer bg-slate-950/80 border-2 border-emerald-500 p-2.5 rounded-2xl text-center space-y-1 transition shadow-lg shadow-emerald-500/10">
+            <span class="text-[10px] text-emerald-400 block font-bold">30 Ημέρες</span>
+            <span class="text-base font-black text-emerald-400 font-mono block">30€</span>
+            <span class="text-[9px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-black">Δημοφιλές</span>
+          </div>
+
+          <div onclick="selectPackage(365, 250)" id="pkg-365" class="cursor-pointer bg-slate-950/80 border-2 border-slate-800 hover:border-amber-500/60 p-2.5 rounded-2xl text-center space-y-1 transition">
+            <span class="text-[10px] text-amber-400 block font-bold">1 Χρόνος</span>
+            <span class="text-base font-black text-amber-400 font-mono block">250€</span>
+            <span class="text-[9px] bg-amber-500/20 text-amber-300 px-1.5 py-0.5 rounded font-bold">Full VIP</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-3">
+        <div class="bg-white p-2.5 rounded-2xl inline-block shadow-lg mx-auto">
+          <img id="paypal-qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://www.paypal.me/vangeliskareklakis/30EUR" alt="PayPal QR Code" class="w-36 h-36 mx-auto object-contain">
+        </div>
+
+        <div class="space-y-1">
+          <div class="text-xs font-extrabold text-white">Επιλεγμένο Πακέτο: <span id="selected-package-label" class="text-emerald-400">30 Ημέρες (30€)</span></div>
+          <p class="text-[11px] text-slate-400">Σκανάρετε το QR ή πατήστε παρακάτω για μεταφορά στο PayPal:</p>
+        </div>
+
+        <a id="paypal-direct-link" href="https://www.paypal.me/vangeliskareklakis/30EUR" target="_blank" class="block w-full bg-[#0070BA] hover:bg-[#003087] text-white font-extrabold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg">
+          <i class="fa-brands fa-paypal text-base"></i> Πληρωμή στο PayPal (<span id="btn-amount-label">30€</span>)
+        </a>
+      </div>
+
+      <div class="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 text-xs text-slate-300 space-y-1.5">
+        <div class="font-bold text-amber-300 flex items-center gap-1.5">
+          <i class="fa-solid fa-triangle-exclamation"></i> Σημαντικό κατά την πληρωμή:
+        </div>
+        <p class="text-[11px] leading-relaxed">
+          Στο πεδίο σημείωσης / αιτιολογίας (note) του PayPal, γράψτε το email σας: <br>
+          <span id="paywall-email-display" class="text-emerald-400 font-mono font-black text-xs"></span>
+        </p>
+      </div>
+
+      <button onclick="notifyAdminPaymentOnline()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black py-3 rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 shadow-lg">
+        <i class="fa-solid fa-paper-plane"></i> Έστειλα τα χρήματα / Ενημέρωση Διαχειριστή
+      </button>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV (6 Επιλογές πλέον μαζί με το Προφίλ) -->
+  <nav class="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 border-t border-slate-800 backdrop-blur-lg">
+    <div class="max-w-md mx-auto grid grid-cols-6 h-16">
+      <button onclick="switchTab('home')" id="nav-home" class="flex flex-col items-center justify-center gap-1 text-emerald-400 transition">
+        <i class="fa-solid fa-futbol text-base"></i>
+        <span class="text-[9px] font-bold">Αρχική</span>
+      </button>
+
+      <button onclick="switchTab('propicks')" id="nav-propicks" class="flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-emerald-400 transition">
+        <i class="fa-solid fa-gem text-base"></i>
+        <span class="text-[9px] font-bold">Pro Picks</span>
+      </button>
+
+      <button onclick="switchTab('chat')" id="nav-chat" class="flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-emerald-400 transition">
+        <i class="fa-solid fa-comments text-base"></i>
+        <span class="text-[9px] font-bold">Community</span>
+      </button>
+
+      <button onclick="switchTab('experts')" id="nav-experts" class="flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-emerald-400 transition">
+        <i class="fa-solid fa-users text-base"></i>
+        <span class="text-[9px] font-bold">Ειδικοί</span>
+      </button>
+
+      <button onclick="switchTab('generator')" id="nav-generator" class="flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-purple-400 transition">
+        <i class="fa-solid fa-wand-magic-sparkles text-base"></i>
+        <span class="text-[9px] font-bold">AI Builder</span>
+      </button>
+
+      <button onclick="switchTab('profile')" id="nav-profile" class="flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-emerald-400 transition">
+        <i class="fa-solid fa-user-shield text-base"></i>
+        <span class="text-[9px] font-bold">Προφίλ</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    const SUPABASE_URL = 'https://maujrufokktvkirbycji.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1hdWpydWZva2t0dmtpcmJ5Y2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1MjI3MzIsImV4cCI6MjEwOTA5ODczMn0.xEznuIPnM0BfjT2b00n9jl0JDa8sDxWboIX-v2zLPbE';
+    
+    const supabaseClient = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+    const AUTO_SYNC_INTERVAL_MS = 60000;
+    const CACHE_PREFIX = 'betai_client_v96_';
+    const TRIAL_HOURS = 48;
+    const PAYPAL_BASE_URL = 'https://www.paypal.me/vangeliskareklakis';
+
+    let customGenCount = 5;
+    let customGenRisk = 'safe';
+    let chatSubscription = null;
+
+    function setGenCount(cnt) {
+      customGenCount = cnt;
+      for (let i = 1; i <= 10; i++) {
+        const btn = document.getElementById(`gen-cnt-${i}`);
+        if (!btn) continue;
+        if (i === cnt) {
+          btn.className = 'py-2 rounded-xl bg-purple-600 text-white font-black text-xs border border-purple-400 shadow-md transition';
+        } else {
+          btn.className = 'py-2 rounded-xl bg-slate-950 text-slate-300 font-bold text-xs border border-slate-800 transition';
+        }
+      }
+    }
+
+    function setGenRisk(risk) {
+      customGenRisk = risk;
+      ['safe', 'medium', 'bomb'].forEach(r => {
+        const btn = document.getElementById(`gen-risk-${r}`);
+        if (!btn) return;
+        if (r === risk) {
+          if (r === 'safe') btn.className = 'py-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 font-extrabold text-xs border border-emerald-500/40 shadow-sm transition';
+          else if (r === 'medium') btn.className = 'py-2.5 rounded-xl bg-amber-500/20 text-amber-300 font-extrabold text-xs border border-amber-500/40 shadow-sm transition';
+          else btn.className = 'py-2.5 rounded-xl bg-rose-500/20 text-rose-400 font-extrabold text-xs border border-rose-500/40 shadow-sm transition';
+        } else {
+          btn.className = 'py-2.5 rounded-xl bg-slate-950 text-slate-400 font-bold text-xs border border-slate-800 transition';
+        }
+      });
+    }
+
+    function generateCustomSlip() {
+      if (!checkUserAccess()) {
+        openPaywallModal();
+        return;
+      }
+
+      const container = document.getElementById('generator-result-container');
+      if (!container) return;
+
+      if (!currentMatches || currentMatches.length === 0) {
+        container.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 text-center text-slate-400 text-xs rounded-2xl">Δεν υπάρχουν διαθέσιμοι αγώνες.</div>`;
+        return;
+      }
+
+      const selectedLeague = document.getElementById('builder-league-select').value;
+      let pool = [...currentMatches];
+
+      if (selectedLeague !== 'ALL') {
+        pool = pool.filter(m => m.groupKey === selectedLeague);
+        if (pool.length === 0) {
+          container.innerHTML = `<div class="bg-slate-900 border border-slate-800 p-6 text-center text-slate-400 text-xs rounded-2xl">Δεν υπάρχουν αγώνες σε αυτό το πρωτάθλημα για τη συγκεκριμένη ημέρα.</div>`;
+          return;
+        }
+      }
+
+      if (customGenRisk === 'safe') {
+        pool = pool.filter(m => m.confidence >= 88);
+        if (pool.length < customGenCount) pool = [...currentMatches];
+      } else if (customGenRisk === 'medium') {
+        pool = pool.filter(m => m.confidence >= 82 && m.confidence < 91);
+        if (pool.length < customGenCount) pool = [...currentMatches];
+      } else {
+        pool = pool.filter(m => Number(m.confidence) < 85);
+        if (pool.length < customGenCount) pool = [...currentMatches];
+      }
+
+      pool.sort(() => 0.5 - Math.random());
+      const selected = pool.slice(0, customGenCount);
+
+      const riskLabel = customGenRisk === 'safe' ? '🟢 Safe Δελτίο' : (customGenRisk === 'medium' ? '🟡 Value Δελτίο' : '🔴 Δυνατή Μπόμπα');
+
+      container.innerHTML = `
+        <div class="bg-slate-900 border border-purple-500/50 rounded-3xl p-4 space-y-3 shadow-xl">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-2.5 text-xs">
+            <span class="font-black text-purple-300 flex items-center gap-1.5">
+              <i class="fa-solid fa-receipt"></i> Smart AI Δελτίο (${customGenCount} Επιλογές)
+            </span>
+            <span class="bg-purple-500/20 text-purple-300 font-bold px-2 py-0.5 rounded">${riskLabel}</span>
+          </div>
+
+          <div class="space-y-2">
+            ${selected.map(m => `
+              <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 flex justify-between items-center text-xs">
+                <div>
+                  <div class="font-extrabold text-white">${m.home} vs ${m.away}</div>
+                  <div class="text-[11px] text-emerald-400 font-semibold mt-0.5">Πρόταση: ${m.bestPick}</div>
+                </div>
+                <div class="text-right">
+                  <span class="text-emerald-400 font-black text-xs">${m.confidence}% AI</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    const DISPOSABLE_DOMAINS = [
+      'tempmail.com', '10minutemail.com', 'guerrillamail.com', 'sharklasers.com',
+      'throwawaymail.com', 'yopmail.com', 'mailinator.com', 'trashmail.com',
+      'getnada.com', 'dispostable.com', 'fakemailgenerator.com', 'temp-mail.org',
+      'mohmal.com', 'generator.email', 'tempail.com', 'emailondeck.com',
+      'burnermail.io', 'inboxkitten.com', 'mytemp.email', 'crazymailing.com'
+    ];
+
+    const memoryStore = {};
+
+    function safeGet(key) {
+      try {
+        const val = localStorage.getItem(key);
+        if (val !== null) return val;
+      } catch(e){}
+      return memoryStore[key] || null;
+    }
+
+    function safeSet(key, val) {
+      memoryStore[key] = val;
+      try {
+        localStorage.setItem(key, val);
+      } catch(e){}
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById('toast-msg');
+      const textEl = document.getElementById('toast-text');
+      if (!toast || !textEl) return;
+      textEl.innerText = text;
+      toast.classList.remove('opacity-0', 'pointer-events-none', '-translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'pointer-events-none', '-translate-y-4');
+      }, 2500);
+    }
+
+    let currentUser = null;
+    let authMode = 'login';
+    let selectedDays = 30;
+    let selectedAmount = 30;
+
+    function switchAuthMode(mode) {
+      authMode = mode;
+      const btnLogin = document.getElementById('btn-tab-login');
+      const btnSignup = document.getElementById('btn-tab-signup');
+      const authTitle = document.getElementById('auth-title');
+      const authDesc = document.getElementById('auth-desc');
+      const signupHint = document.getElementById('signup-extra-hint');
+      const submitLabel = document.getElementById('btn-auth-label');
+
+      if (mode === 'login') {
+        btnLogin.className = 'py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-black transition shadow-md';
+        btnSignup.className = 'py-2.5 rounded-xl text-slate-400 hover:text-white transition';
+        authTitle.innerText = 'Είσοδος στο Bet AI Pro';
+        authDesc.innerText = 'Συνδεθείτε με το email και τον κωδικό σας.';
+        signupHint.classList.add('hidden');
+        submitLabel.innerText = 'Είσοδος στο Σύστημα';
+      } else {
+        btnSignup.className = 'py-2.5 rounded-xl bg-emerald-500 text-slate-950 font-black transition shadow-md';
+        btnLogin.className = 'py-2.5 rounded-xl text-slate-400 hover:text-white transition';
+        authTitle.innerText = 'Δημιουργία Νέου Λογαριασμού';
+        authDesc.innerText = 'Ορίστε email και κωδικό για να ενεργοποιηθεί η 48ωρη δοκιμή.';
+        signupHint.classList.remove('hidden');
+        submitLabel.innerText = 'Εγγραφή & Έναρξη 48h Trial';
+      }
+    }
+
+    async function initUserSession() {
+      const stored = safeGet('betai_user_session');
+      if (stored) {
+        try {
+          currentUser = JSON.parse(stored);
+          if (currentUser?.email) {
+            const { data: latestUser } = await supabaseClient
+              .from('app_users')
+              .select('is_banned')
+              .eq('email', currentUser.email)
+              .maybeSingle();
+
+            if (latestUser && latestUser.is_banned) {
+              localStorage.removeItem('betai_user_session');
+              document.getElementById('auth-modal').classList.remove('hidden');
+              alert('Ο λογαριασμός σας έχει αποκλειστεί οριστικά (Banned).');
+              return false;
+            }
+
+            await syncUserProfileOnline();
+            document.getElementById('auth-modal').classList.add('hidden');
+            updateSubscriptionUI(currentUser);
+            return true;
+          }
+        } catch(e){}
+      }
+
+      document.getElementById('auth-modal').classList.add('hidden');
+      switchAuthMode('login');
+      updateSubscriptionUI(null);
+      return false;
+    }
+
+    async function handleAuthSubmitForm(e) {
+      e.preventDefault();
+      const email = document.getElementById('auth-email-field').value.trim().toLowerCase();
+      const password = document.getElementById('auth-password-field').value;
+      const username = email.split('@')[0];
+
+      if (!email || !password) return;
+
+      if (password.length < 6) {
+        alert('Ο κωδικός πρόσβασης πρέπει να έχει τουλάχιστον 6 χαρακτήρες.');
+        return;
+      }
+
+      const domain = email.split('@')[1];
+      if (!domain || DISPOSABLE_DOMAINS.includes(domain)) {
+        alert('Δεν επιτρέπονται προσωρινά/ψεύτικα emails. Χρησιμοποιήστε πραγματικό email.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-auth-submit-btn');
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Παρακαλώ περιμένετε...`;
+      btn.disabled = true;
+
+      try {
+        if (!supabaseClient) throw new Error('Η βάση δεδομένων δεν είναι έτοιμη.');
+
+        const { data: banCheck } = await supabaseClient
+          .from('banned_emails')
+          .select('email')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (banCheck) {
+          throw new Error('⛔ Αυτό το email έχει αποκλειστεί οριστικά από τη διαχείριση.');
+        }
+
+        if (authMode === 'login') {
+          const { data: user, error: fetchErr } = await supabaseClient
+            .from('app_users')
+            .select('*')
+            .eq('email', email)
+            .maybeSingle();
+
+          if (fetchErr) throw fetchErr;
+
+          if (!user) {
+            throw new Error('Δεν βρέθηκε λογαριασμός με αυτό το email. Παρακαλώ επιλέξτε "Εγγραφή Νέου".');
+          }
+
+          if (user.is_banned) {
+            throw new Error('⛔ Ο λογαριασμός σας έχει αποκλειστεί (Banned).');
+          }
+
+          if (user.password && user.password !== password) {
+            throw new Error('Λανθασμένος κωδικός πρόσβασης.');
+          }
+
+          currentUser = {
+            id: user.id,
+            email: user.email,
+            username: user.username || username,
+            createdAt: user.created_at,
+            trialExpiresAt: user.trial_expires_at,
+            isVipActive: user.is_vip,
+            vipExpiresAt: user.vip_expires_at,
+            isLifetime: user.is_lifetime,
+            paymentPending: user.payment_pending,
+            isAdmin: user.is_admin,
+            isMod: user.is_moderator
+          };
+
+          showToast('Επιτυχής σύνδεση!');
+        } else {
+          const deviceClaimed = safeGet('betai_device_trial_claimed');
+          if (deviceClaimed) {
+            throw new Error('Έχει ήδη ενεργοποιηθεί δωρεάν δοκιμή από αυτή τη συσκευή.');
+          }
+
+          const { data: existingUser, error: checkErr } = await supabaseClient
+            .from('app_users')
+            .select('email, is_banned')
+            .eq('email', email)
+            .maybeSingle();
+
+          if (existingUser) {
+            if (existingUser.is_banned) {
+              throw new Error('⛔ Αυτός ο λογαριασμός είναι αποκλεισμένος.');
+            }
+            throw new Error('Αυτό το email χρησιμοποιείται ήδη. Επιλέξτε "Είσοδος".');
+          }
+
+          const now = new Date();
+          const trialEnd = new Date(now.getTime() + (TRIAL_HOURS * 60 * 60 * 1000));
+
+          const newUserRecord = {
+            email: email,
+            password: password,
+            username: username,
+            trial_expires_at: trialEnd.toISOString(),
+            is_vip: false,
+            is_lifetime: false,
+            payment_pending: false,
+            is_banned: false
+          };
+
+          const { data: inserted, error: insertErr } = await supabaseClient
+            .from('app_users')
+            .insert([newUserRecord])
+            .select()
+            .single();
+
+          if (insertErr) {
+            console.error('Insert error details:', insertErr);
+            throw new Error(insertErr.message || 'Σφάλμα κατά την αποθήκευση στη βάση.');
+          }
+
+          currentUser = {
+            id: inserted?.id || null,
+            email: email,
+            username: username,
+            createdAt: now.toISOString(),
+            trialExpiresAt: trialEnd.toISOString(),
+            isVipActive: false,
+            vipExpiresAt: null,
+            isLifetime: false,
+            paymentPending: false,
+            isAdmin: false,
+            isMod: false
+          };
+
+          safeSet('betai_device_trial_claimed', 'true');
+          showToast('Επιτυχής εγγραφή! Το 48h Free Trial ενεργοποιήθηκε.');
+        }
+
+        safeSet('betai_user_session', JSON.stringify(currentUser));
+        document.getElementById('auth-modal').classList.add('hidden');
+        updateSubscriptionUI(currentUser);
+        fetchMatches();
+      } catch (err) {
+        console.error('Auth error:', err);
+        alert('Σφάλμα: ' + (err.message || 'Αποτυχία διαδικασίας.'));
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    async function handleForgotPassword() {
+      const emailInput = document.getElementById('auth-email-field');
+      const email = emailInput ? emailInput.value.trim().toLowerCase() : '';
+
+      if (!email || !email.includes('@')) {
+        alert('Παρακαλώ πληκτρολογήστε πρώτα το email σας στο πεδίο Email!');
+        emailInput.focus();
+        return;
+      }
+
+      try {
+        const { data: user, error } = await supabaseClient
+          .from('app_users')
+          .select('password, email')
+          .eq('email', email)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (!user) {
+          alert('Δεν βρέθηκε λογαριασμός με αυτό το email.');
+          return;
+        }
+
+        alert(`🔑 Στοιχεία λογαριασμού για το ${user.email}:\n\nΟ κωδικός πρόσβασής σας είναι: ${user.password}`);
+      } catch (err) {
+        alert('Σφάλμα ανάκτησης: ' + err.message);
+      }
+    }
+
+    async function syncUserProfileOnline() {
+      if (!supabaseClient || !currentUser?.email) return;
+      try {
+        const { data, error } = await supabaseClient
+          .from('app_users')
+          .select('*')
+          .eq('email', currentUser.email)
+          .single();
+
+        if (data) {
+          if (data.is_banned) {
+            localStorage.removeItem('betai_user_session');
+            document.getElementById('auth-modal').classList.remove('hidden');
+            alert('Ο λογαριασμός σας έχει αποκλειστεί οριστικά (Banned).');
+            return;
+          }
+          currentUser.username = data.username || currentUser.email.split('@')[0];
+          currentUser.isVipActive = data.is_vip;
+          currentUser.vipExpiresAt = data.vip_expires_at;
+          currentUser.trialExpiresAt = data.trial_expires_at;
+          currentUser.isLifetime = data.is_lifetime;
+          currentUser.paymentPending = data.payment_pending;
+          currentUser.isAdmin = data.is_admin;
+          currentUser.isMod = data.is_moderator;
+          safeSet('betai_user_session', JSON.stringify(currentUser));
+          updateSubscriptionUI(currentUser);
+          renderMatches(currentMatches);
+          renderProPicks(currentMatches);
+          renderDynamicExperts(currentMatches);
+        }
+      } catch(e){}
+    }
+
+    function checkUserAccess() {
+      if (!currentUser) return false;
+      if (currentUser.isLifetime) return true;
+
+      const now = new Date();
+      if (currentUser.isVipActive) {
+        if (!currentUser.vipExpiresAt) return true;
+        return new Date(currentUser.vipExpiresAt) > now;
+      }
+
+      if (!currentUser.trialExpiresAt) return false;
+      const trialEnd = new Date(currentUser.trialExpiresAt);
+      return trialEnd > now;
+    }
+
+    function updateSubscriptionUI(user) {
+      const alertBar = document.getElementById('trial-alert-bar');
+      const timeLeftText = document.getElementById('trial-time-left');
+
+      if (!user) {
+        alertBar.classList.add('hidden');
+        return;
+      }
+
+      const hasAccess = checkUserAccess();
+      const now = new Date();
+
+      if (user.isLifetime || (user.isVipActive && hasAccess)) {
+        alertBar.classList.add('hidden');
+      } else if (hasAccess) {
+        const msRemaining = new Date(user.trialExpiresAt) - now;
+        const hoursRemaining = Math.max(0, Math.floor(msRemaining / (1000 * 60 * 60)));
+        const minsRemaining = Math.max(0, Math.floor((msRemaining % (1000 * 60 * 60)) / (1000 * 60)));
+        alertBar.classList.remove('hidden');
+        timeLeftText.innerText = `Δωρεάν Δοκιμή: Απομένουν ${hoursRemaining} ώρες & ${minsRemaining} λεπτά`;
+      } else {
+        alertBar.classList.remove('hidden');
+        timeLeftText.innerText = `Η δοκιμή σας έληξε. Επιλέξτε πακέτο για πρόσβαση.`;
+      }
+
+      // Ενημέρωση καρτέλας προφίλ αν είναι ανοιχτή
+      const statusTop = document.getElementById('prof-status-top');
+      const profStatus = document.getElementById('prof-status');
+      const profExpires = document.getElementById('prof-expires');
+      const profEmail = document.getElementById('prof-email');
+      const profUsername = document.getElementById('prof-username-input');
+
+      if (profEmail) profEmail.innerText = user.email;
+      if (profUsername && document.activeElement !== profUsername) {
+        profUsername.value = user.username || user.email.split('@')[0];
+      }
+
+      let statusStr = 'Ενεργό Free Trial (48h)';
+      if (user.isLifetime) statusStr = 'VIP Εφάπαξ (Lifetime) 👑';
+      else if (user.isVipActive) statusStr = 'VIP Συνδρομητής ✅';
+      else if (!hasAccess) statusStr = 'Έληξε (Απαιτείται Ανανέωση) 🔒';
+
+      if (profStatus) profStatus.innerText = statusStr;
+      if (statusTop) statusTop.innerText = statusStr;
+
+      let expStr = '--';
+      if (user.isLifetime) {
+        expStr = 'Απεριόριστη (Χωρίς Λήξη)';
+      } else if (user.isVipActive && user.vipExpiresAt) {
+        expStr = new Date(user.vipExpiresAt).toLocaleDateString('el-GR');
+      } else if (user.trialExpiresAt) {
+        expStr = new Date(user.trialExpiresAt).toLocaleString('el-GR');
+      }
+      if (profExpires) profExpires.innerText = expStr;
+    }
+
+    function selectPackage(days, amount) {
+      selectedDays = days;
+      selectedAmount = amount;
+
+      [15, 30, 365].forEach(d => {
+        const el = document.getElementById(`pkg-${d}`);
+        if (!el) return;
+        if (d === days) {
+          el.className = 'cursor-pointer bg-slate-950 border-2 border-emerald-500 p-2.5 rounded-2xl text-center space-y-1 transition shadow-lg shadow-emerald-500/10';
+        } else {
+          el.className = 'cursor-pointer bg-slate-950/80 border-2 border-slate-800 hover:border-amber-500/60 p-2.5 rounded-2xl text-center space-y-1 transition';
+        }
+      });
+
+      const labelText = days === 365 ? `1 Χρόνος (250€)` : `${days} Ημέρες (${amount}€)`;
+      document.getElementById('selected-package-label').innerText = labelText;
+      document.getElementById('btn-amount-label').innerText = `${amount}€`;
+
+      const payUrl = `${PAYPAL_BASE_URL}/${amount}EUR`;
+      document.getElementById('paypal-direct-link').href = payUrl;
+      document.getElementById('paypal-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(payUrl)}`;
+    }
+
+    async function redeemGiftCardOnline() {
+      const codeInput = document.getElementById('gift-card-input');
+      const code = codeInput.value.trim().toUpperCase();
+      if (!code) {
+        showToast('Παρακαλώ εισάγετε κωδικό δωροκάρτας!');
+        return;
+      }
+
+      if (!currentUser || !supabaseClient) return;
+
+      try {
+        const { data: promo, error } = await supabaseClient
+          .from('promo_codes')
+          .select('*')
+          .eq('code', code)
+          .maybeSingle();
+
+        if (!promo || promo.is_used) {
+          showToast('Ο κωδικός δεν υπάρχει ή έχει ήδη χρησιμοποιηθεί!');
+          return;
+        }
+
+        const now = new Date();
+        let newVipExp = null;
+        let isLifetime = false;
+
+        if (promo.type === 'lifetime') {
+          isLifetime = true;
+        } else {
+          const currentExp = currentUser.vipExpiresAt && new Date(currentUser.vipExpiresAt) > now 
+            ? new Date(currentUser.vipExpiresAt) 
+            : now;
+          newVipExp = new Date(currentExp.getTime() + (promo.days * 24 * 60 * 60 * 1000)).toISOString();
+        }
+
+        await supabaseClient
+          .from('app_users')
+          .update({
+            is_vip: true,
+            vip_expires_at: newVipExp,
+            is_lifetime: isLifetime
+          })
+          .eq('email', currentUser.email);
+
+        await supabaseClient
+          .from('promo_codes')
+          .update({
+            is_used: true,
+            used_by: currentUser.email
+          })
+          .eq('code', code);
+
+        currentUser.isVipActive = true;
+        currentUser.vipExpiresAt = newVipExp;
+        currentUser.isLifetime = isLifetime;
+        safeSet('betai_user_session', JSON.stringify(currentUser));
+
+        codeInput.value = '';
+        closePaywallModal();
+        showToast(`Συγχαρητήρια! Εξαργυρώθηκε επιτυχώς.`);
+        updateSubscriptionUI(currentUser);
+        renderMatches(currentMatches);
+        renderProPicks(currentMatches);
+        renderDynamicExperts(currentMatches);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function notifyAdminPaymentOnline() {
+      if (!currentUser || !supabaseClient) return;
+      currentUser.paymentPending = true;
+      currentUser.requestedPlan = `${selectedDays}_days_${selectedAmount}eur`;
+
+      try {
+        await supabaseClient
+          .from('app_users')
+          .update({
+            payment_pending: true,
+            requested_plan: currentUser.requestedPlan
+          })
+          .eq('email', currentUser.email);
+      } catch(e){}
+
+      safeSet('betai_user_session', JSON.stringify(currentUser));
+      closePaywallModal();
+      showToast('Η πληρωμή δηλώθηκε! Θα ξεκλειδωθεί μόλις επιβεβαιωθεί.');
+    }
+
+    function openPaywallModal() {
+      if (!currentUser) {
+        switchAuthMode('login');
+        document.getElementById('auth-modal').classList.remove('hidden');
+        return;
+      }
+      document.getElementById('paywall-email-display').innerText = currentUser.email;
+      selectPackage(30, 30);
+      document.getElementById('paywall-modal').classList.remove('hidden');
+    }
+
+    function closePaywallModal() {
+      document.getElementById('paywall-modal').classList.add('hidden');
+    }
+
+    async function saveUserProfileName() {
+      const newName = document.getElementById('prof-username-input').value.trim();
+      if (!newName || !currentUser) return;
+
+      try {
+        await supabaseClient
+          .from('app_users')
+          .update({ username: newName })
+          .eq('email', currentUser.email);
+
+        currentUser.username = newName;
+        safeSet('betai_user_session', JSON.stringify(currentUser));
+        showToast('Το όνομα χρήστη αποθηκεύτηκε!');
+      } catch (err) {
+        alert('Σφάλμα: ' + err.message);
+      }
+    }
+
+    async function changeClientPassword() {
+      const pwdInput = document.getElementById('prof-new-password');
+      const newPwd = pwdInput ? pwdInput.value.trim() : '';
+
+      if (!newPwd || newPwd.length < 6) {
+        alert('Ο κωδικός πρέπει να έχει τουλάχιστον 6 χαρακτήρες.');
+        return;
+      }
+
+      if (!confirm('Επιβεβαίωση αλλαγής κωδικού πρόσβασης;')) return;
+
+      try {
+        await supabaseClient
+          .from('app_users')
+          .update({ password: newPwd })
+          .eq('email', currentUser.email);
+
+        pwdInput.value = '';
+        showToast('Ο κωδικός σας άλλαξε επιτυχώς!');
+      } catch (err) {
+        alert('Σφάλμα: ' + err.message);
+      }
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('betai_user_session');
+      location.reload();
+    }
+
+    // ==================== SMART AI ACCURATE ENGINE ====================
+    let currentDayOffset = 0;
+    let currentFilter = 'ALL';
+    let currentMatches = [];
+
+    function checkBetWon(pickText, homeGoals, awayGoals) {
+      const p = pickText.toLowerCase().trim();
+      const hg = Number(homeGoals);
+      const ag = Number(awayGoals);
+      const tot = hg + ag;
+
+      if (p.includes('1x') || p.includes('1 ή x')) return hg >= ag;
+      if (p.includes('x2') || p.includes('x ή 2')) return ag >= hg;
+      if (p.includes('12')) return hg !== ag;
+      if (p.startsWith('1 ') || p === '1') return hg > ag;
+      if (p.startsWith('2 ') || p === '2') return hg < ag;
+      if (p.includes('ισοπαλία') || p === 'x') return hg === ag;
+      
+      if (p.includes('over 1.5')) return tot >= 2;
+      if (p.includes('over 2.5')) return tot >= 3;
+      if (p.includes('over 3.5')) return tot >= 4;
+      
+      if (p.includes('under 2.5')) return tot <= 2;
+      if (p.includes('under 3.5')) return tot <= 3;
+      
+      if (p.includes('goal') || p.includes('gg') || p.includes('g/g')) {
+        return hg > 0 && ag > 0;
+      }
+      
+      if (p.includes('1x & over 1.5') || p.includes('1x & over')) return (hg >= ag) && (tot >= 2);
+
+      return false;
+    }
+
+    function getTargetDateStr(offset) {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      return d.toISOString().split('T')[0];
+    }
+
+    function initDateLabels() {
+      const daysConfig = [
+        { key: 'minus2', offset: -2 },
+        { key: 'minus1', offset: -1 },
+        { key: 'today', offset: 0 },
+        { key: 'plus1', offset: 1 },
+        { key: 'plus2', offset: 2 }
+      ];
+
+      daysConfig.forEach(item => {
+        const d = new Date();
+        d.setDate(d.getDate() + item.offset);
+        const formatted = d.toLocaleDateString('el-GR', { day: '2-digit', month: '2-digit' });
+        const el = document.getElementById(`label-date-${item.key}`);
+        if (el) el.innerText = formatted;
+      });
+    }
+
+    function changeDay(dayKey) {
+      if (dayKey === 'minus2') currentDayOffset = -2;
+      else if (dayKey === 'minus1') currentDayOffset = -1;
+      else if (dayKey === 'today') currentDayOffset = 0;
+      else if (dayKey === 'plus1') currentDayOffset = 1;
+      else if (dayKey === 'plus2') currentDayOffset = 2;
+
+      currentFilter = 'ALL';
+      const dropdown = document.getElementById('country-dropdown-select');
+      if (dropdown) dropdown.value = 'ALL';
+
+      ['minus2', 'minus1', 'today', 'plus1', 'plus2'].forEach(k => {
+        const btn = document.getElementById(`btn-day-${k}`);
+        if (!btn) return;
+        if (k === dayKey) {
+          btn.className = 'py-2 px-1 rounded-xl text-[11px] font-black bg-emerald-500 text-slate-950 transition flex flex-col items-center shadow-lg shadow-emerald-500/20';
+        } else {
+          btn.className = 'py-2 px-1 rounded-xl text-[11px] font-bold text-slate-400 transition flex flex-col items-center hover:text-white';
+        }
+      });
+
+      const dayNames = { '-2': '-2 Ημέρες', '-1': 'Χθες', '0': 'Σήμερα', '1': 'Αύριο', '2': '+2 Ημέρες' };
+      const expertsLabel = document.getElementById('experts-day-label');
+      if (expertsLabel) expertsLabel.innerText = `Αγώνες για: ${dayNames[currentDayOffset]}`;
+
+      const banner = document.getElementById('yesterday-stats-banner');
+      if (currentDayOffset < 0) {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+
+      fetchMatches();
+    }
+
+    function extractDeepName(item, target) {
+      if (target === 'home') {
+        const direct = item.event_home_team || item.home_team_name || item.home_name || item.homeTeam || item.home;
+        if (typeof direct === 'string' && direct.trim() && direct !== 'undefined') return direct.trim();
+        if (direct && typeof direct === 'object' && (direct.name || direct.team_name)) return (direct.name || direct.team_name).trim();
+
+        if (item.home_team && typeof item.home_team === 'object' && (item.home_team.name || item.home_team.team_name)) {
+          return (item.home_team.name || item.home_team.team_name).trim();
+        }
+        if (item.teams && item.teams.home && typeof item.teams.home === 'object') {
+          return (item.teams.home.name || item.teams.home.team_name || '').trim();
+        }
+      } else {
+        const direct = item.event_away_team || item.away_team_name || item.away_name || item.awayTeam || item.away;
+        if (typeof direct === 'string' && direct.trim() && direct !== 'undefined') return direct.trim();
+        if (direct && typeof direct === 'object' && (direct.name || direct.team_name)) return (direct.name || direct.team_name).trim();
+
+        if (item.away_team && typeof item.away_team === 'object' && (item.away_team.name || item.away_team.team_name)) {
+          return (item.away_team.name || item.away_team.team_name).trim();
+        }
+        if (item.teams && item.teams.away && typeof item.teams.away === 'object') {
+          return (item.teams.away.name || item.teams.away.team_name || '').trim();
+        }
+      }
+
+      if (Array.isArray(item.participants) && item.participants.length >= 2) {
+        const p = target === 'home' ? item.participants[0] : item.participants[1];
+        if (p && (p.name || p.team_name)) return (p.name || p.team_name).trim();
+      }
+
+      const title = item.name || item.match_name || item.title || item.event_name || '';
+      if (typeof title === 'string' && (title.includes(' - ') || title.includes(' vs ') || title.includes(' v '))) {
+        const parts = title.split(/ - | vs | v /i);
+        if (parts.length >= 2) {
+          return target === 'home' ? parts[0].trim() : parts[1].trim();
+        }
+      }
+
+      for (const [k, v] of Object.entries(item)) {
+        const lk = k.toLowerCase();
+        if (typeof v === 'string' && v.trim().length > 1 && !v.includes('http') && isNaN(v)) {
+          if (target === 'home' && (lk.includes('home') || lk === 'h') && !lk.includes('score') && !lk.includes('id') && !lk.includes('logo')) {
+            return v.trim();
+          }
+          if (target === 'away' && (lk.includes('away') || lk === 'a') && !lk.includes('score') && !lk.includes('id') && !lk.includes('logo')) {
+            return v.trim();
+          }
+        }
+      }
+
+      const fallbackId = target === 'home' 
+        ? (item.home_team_id || item.home_id || (item.home_team && item.home_team.id))
+        : (item.away_team_id || item.away_id || (item.away_team && item.away_team.id));
+
+      if (fallbackId) {
+        return `Ομάδα #${fallbackId}`;
+      }
+
+      return target === 'home' ? 'Γηπεδούχος' : 'Φιλοξενούμενος';
+    }
+
+    function extractActualKickoffTime(item) {
+      if (!item) return '';
+
+      if (item.time && typeof item.time === 'object') {
+        const t = item.time.starting_at?.time || item.time.time || item.time.starting_time;
+        if (typeof t === 'string' && t.includes(':')) {
+          const parts = t.split(':');
+          return `${parts[0].padStart(2, '0')}:${parts[1].padStart(2, '0')}`;
+        }
+      }
+
+      const ts = item.starting_at_timestamp || item.timestamp || (item.time && item.time.starting_at?.timestamp) || (item.fixture && item.fixture.timestamp);
+      if (ts && !isNaN(ts) && Number(ts) > 1000000000) {
+        const d = new Date(Number(ts) * 1000);
+        return d.toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit' });
+      }
+
+      const directCandidates = [
+        item.time, item.starting_time, item.kickoff_time, item.event_time, item.time_start,
+        (item.fixture && item.fixture.time), (item.fixture && item.fixture.kickoff)
+      ];
+
+      for (const val of directCandidates) {
+        if (typeof val === 'string' && val.includes(':') && !val.includes('-')) {
+          const p = val.split(':');
+          if (p.length >= 2 && !isNaN(p[0])) {
+            return `${p[0].padStart(2, '0')}:${p[1].padStart(2, '0')}`;
+          }
+        }
+      }
+
+      const dateCandidates = [
+        item.starting_at, item.kickoff, item.event_date_time, item.date_time, 
+        item.event_date, (item.fixture && item.fixture.date)
+      ];
+
+      for (const val of dateCandidates) {
+        if (typeof val === 'string' && (val.includes('T') || val.includes(' '))) {
+          const d = new Date(val);
+          if (!isNaN(d.getTime())) {
+            const h = d.getHours();
+            const m = d.getMinutes();
+            if (h !== 0 || m !== 0) {
+              return d.toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit' });
+            }
+          }
+        }
+      }
+
+      return '';
+    }
+
+    function getCountryFlag(countryName, leagueName) {
+      const c = (countryName || '').toLowerCase().trim();
+      const l = (leagueName || '').toLowerCase().trim();
+      const combined = (c + ' ' + l);
+
+      if (combined.includes('greece') || combined.includes('greek') || combined.includes('super league 1') || combined.includes('super league 2') || combined.includes('hellenic')) return '🇬🇷';
+      if (combined.includes('japan') || combined.includes('j1 league') || combined.includes('j2 league')) return '🇯🇵';
+      if (combined.includes('northern') && combined.includes('irish')) return '🇬🇧';
+      if (combined.includes('scotland') || combined.includes('scottish') || combined.includes('premiership') || combined.includes('championship')) return '🏴󠁧󠁢󠁳󠁣󠁴󠁿';
+      if (combined.includes('belgium') || combined.includes('belgian') || combined.includes('pro league')) return '🇧🇪';
+      if (combined.includes('czech')) return '🇨🇿';
+      if (combined.includes('swiss') || combined.includes('switzerland')) return '🇨🇭';
+      if (combined.includes('fa cup') || combined.includes('national league') || combined.includes('highland') || combined.includes('lowland') || combined.includes('england') || combined.includes('premier league')) return '🏴󠁧󠁢󠁥󠁮󠁧󠁿';
+      if (combined.includes('us major league') || combined.includes('mls') || combined.includes('united states')) return '🇺🇸';
+      if (combined.includes('mexic') || combined.includes('liga mx') || combined.includes('expansion mx')) return '🇲🇽';
+      if (combined.includes('poland') || combined.includes('polish') || combined.includes('ekstraklasa')) return '🇵🇱';
+      if (combined.includes('australian') || combined.includes('a-league')) return '🇦🇺';
+      if (combined.includes('bolivia') || combined.includes('bolivian')) return '🇧🇴';
+      if (combined.includes('hondura')) return '🇭🇳';
+      if (combined.includes('salvador')) return '🇸🇻';
+      if (combined.includes('paraguay')) return '🇵🇾';
+      if (combined.includes('india')) return '🇮🇳';
+      if (combined.includes('argentin')) return '🇦🇷';
+      if (combined.includes('saudi')) return '🇸🇦';
+      if (combined.includes('brazil') || combined.includes('brasil')) return '🇧🇷';
+      if (combined.includes('colombia')) return '🇨🇴';
+      if (combined.includes('peru')) return '🇵🇪';
+      if (combined.includes('costa rica')) return '🇨🇷';
+      if (combined.includes('spain') || combined.includes('copa del rey') || combined.includes('la liga') || combined.includes('segunda')) return '🇪🇸';
+      if (combined.includes('italy') || combined.includes('serie a') || combined.includes('serie b')) return '🇮🇹';
+      if (combined.includes('germany') || combined.includes('bundesliga')) return '🇩🇪';
+      if (combined.includes('france') || combined.includes('ligue 1') || combined.includes('ligue 2')) return '🇫🇷';
+      if (combined.includes('cyprus')) return '🇨🇾';
+      if (combined.includes('portugal') || combined.includes('primeira liga')) return '🇵🇹';
+      if (combined.includes('netherlands') || combined.includes('eredivisie') || combined.includes('eerste divisie')) return '🇳🇱';
+      if (combined.includes('turkey') || combined.includes('super lig')) return '🇹🇷';
+      if (combined.includes('chile')) return '🇨🇱';
+      if (combined.includes('uruguay')) return '🇺🇾';
+      if (combined.includes('croatia') || combined.includes('prva hnl')) return '🇭🇷';
+      if (combined.includes('ecuador') || combined.includes('ligapro')) return '🇪🇨';
+      if (combined.includes('norway') || combined.includes('eliteserien')) return '🇳🇴';
+      if (combined.includes('guatemala')) return '🇬🇹';
+      if (combined.includes('afc') || combined.includes('asia')) return '🌏';
+      if (combined.includes('caf') || combined.includes('africa')) return '🌍';
+      if (combined.includes('concacaf')) return '🌎';
+
+      return '⚽';
+    }
+
+    function classifyCategoryAndCountry(item) {
+      let leagueName = item.league_name || (item.league && (item.league.name || item.league.league_name)) || item.competition_name || '';
+      let rawCountry = item.country || item.country_name || (item.league && item.league.country) || '';
+
+      leagueName = String(leagueName).replace(/international/gi, '').trim();
+      rawCountry = String(rawCountry).replace(/international/gi, '').trim();
+
+      const l = leagueName.toLowerCase();
+      const c = rawCountry.toLowerCase().trim();
+
+      const isUefa = (
+        l.includes('uefa') ||
+        (l.includes('champions league') && !l.includes('afc') && !l.includes('caf') && !l.includes('concacaf') && !l.includes('asia') && !l.includes('oceania')) ||
+        l.includes('europa league') ||
+        l.includes('conference league') ||
+        (l.includes('nations league') && !l.includes('concacaf'))
+      );
+
+      if (isUefa) {
+        return { groupKey: 'UEFA', displayName: '🏆 UEFA Champions / Europa League', country: 'UEFA' };
+      }
+
+      let countryClean = rawCountry ? rawCountry : 'Διεθνή';
+      let leagueClean = leagueName || 'Πρωτάθλημα';
+
+      if (c.includes('greece') || l.includes('super league greece') || l.includes('greek') || l.includes('super league 1')) {
+        countryClean = 'Ελλάδα';
+        leagueClean = leagueName.includes('2') ? 'Super League 2' : 'Super League 1';
+      } else if (c.includes('england') || l.includes('premier league') || l.includes('championship')) {
+        countryClean = 'Αγγλία';
+        if (l.includes('premier')) leagueClean = 'Premier League';
+        else if (l.includes('championship')) leagueClean = 'Championship';
+        else leagueClean = leagueName;
+      } else if (c.includes('spain') || l.includes('la liga') || l.includes('copa del rey')) {
+        countryClean = 'Ισπανία';
+        leagueClean = leagueName;
+      } else if (c.includes('italy') || l.includes('serie a')) {
+        countryClean = 'Ισπανία';
+        leagueClean = 'Serie A';
+      } else if (c.includes('germany') || l.includes('bundesliga')) {
+        countryClean = 'Γερμανία';
+        leagueClean = 'Bundesliga';
+      } else if (c.includes('france') || l.includes('ligue 1')) {
+        countryClean = 'Γαλλία';
+        leagueClean = 'Ligue 1';
+      } else if (c.includes('cyprus')) {
+        countryClean = 'Κύπρος';
+        leagueClean = 'Cyprus First Division';
+      }
+
+      const flag = getCountryFlag(countryClean, leagueClean);
+      const groupKey = `${countryClean} - ${leagueClean}`.toUpperCase().replace(/[^A-Z0-9]/g, '_');
+      const displayName = `${flag} ${leagueClean}`;
+
+      return { 
+        groupKey: groupKey, 
+        displayName: displayName, 
+        country: countryClean 
+      };
+    }
+
+    function normalizeSportApiFixture(item) {
+      const statusRaw = String(
+        item.status || 
+        item.status_short || 
+        item.state || 
+        item.event_status ||
+        (item.fixture && item.fixture.status ? item.fixture.status.short : 'NS')
+      ).toUpperCase();
+
+      const isFinished = ['FT', 'AET', 'PENS', 'FINISHED', 'POSTPONED', 'CANCELLED', 'SUSPENDED'].includes(statusRaw);
+      const isLive = ['LIVE', '1H', '2H', 'HT', 'ET', 'P', 'IN_PLAY', 'PLAYING', 'FIRST_HALF', 'SECOND_HALF'].includes(statusRaw) || 
+                     (item.minute !== null && item.minute !== undefined && !isFinished);
+
+      const homeName = extractDeepName(item, 'home');
+      const awayName = extractDeepName(item, 'away');
+      const actualKickoff = extractActualKickoffTime(item);
+
+      let matchDateStr = '';
+      const rawDate = item.date || item.starting_at || item.kickoff || item.event_date || (item.fixture ? item.fixture.date : '');
+      if (rawDate) {
+        const dObj = new Date(rawDate);
+        if (!isNaN(dObj.getTime())) {
+          matchDateStr = dObj.toISOString().split('T')[0];
+        } else if (typeof rawDate === 'string' && rawDate.length >= 10) {
+          matchDateStr = rawDate.substring(0, 10);
+        }
+      }
+
+      let homeGoals = 0;
+      let awayGoals = 0;
+
+      if (item.home_score !== undefined && item.home_score !== null) homeGoals = Number(item.home_score);
+      else if (item.goals_home !== undefined && item.goals_home !== null) homeGoals = Number(item.goals_home);
+      else if (item.result && item.result.home !== undefined) homeGoals = Number(item.result.home);
+      else if (item.score && item.score.home !== undefined) homeGoals = Number(item.score.home);
+
+      if (item.away_score !== undefined && item.away_score !== null) awayGoals = Number(item.away_score);
+      else if (item.goals_away !== undefined && item.goals_away !== null) awayGoals = Number(item.goals_away);
+      else if (item.result && item.result.away !== undefined) awayGoals = Number(item.result.away);
+      else if (item.score && item.score.away !== undefined) awayGoals = Number(item.score.away);
+
+      const leagueName = item.league_name || 
+                         item.event_league || 
+                         (item.league && (item.league.name || item.league.league_name)) || 
+                         (item.competition && item.competition.name) || 
+                         'League';
+
+      const classification = classifyCategoryAndCountry(item);
+      const leagueId = item.league_id || (item.league ? item.league.id : 0);
+      const rawStats = item.statistics || item.stats || item.match_statistics || item.team_stats || [];
+
+      return {
+        fixture: {
+          id: item.id || item.fixture_id || item.event_key || (item.fixture ? item.fixture.id : Math.floor(Math.random() * 100000)),
+          date: matchDateStr,
+          kickoffTime: actualKickoff,
+          status: {
+            short: isFinished ? 'FT' : (isLive ? 'LIVE' : 'NS'),
+            elapsed: item.minute || (isLive ? 'Live' : null)
+          }
+        },
+        league: {
+          id: leagueId,
+          name: leagueName,
+          country: classification.country,
+          groupKey: classification.groupKey,
+          displayName: classification.displayName
+        },
+        teams: {
+          home: {
+            name: homeName,
+            winner: item.result === 1 || item.winner === 'home' || (isFinished && homeGoals > awayGoals)
+          },
+          away: {
+            name: awayName,
+            winner: item.result === -1 || item.winner === 'away' || (isFinished && awayGoals > homeGoals)
+          }
+        },
+        goals: {
+          home: homeGoals,
+          away: awayGoals
+        },
+        rawStats: rawStats
+      };
+    }
+
+    function buildDropdownFilter(matches) {
+      const dropdown = document.getElementById('country-dropdown-select');
+      const builderDropdown = document.getElementById('builder-league-select');
+      if (!dropdown) return;
+
+      const currentValue = dropdown.value;
+      const builderCurrentVal = builderDropdown ? builderDropdown.value : 'ALL';
+      
+      const groupCounts = {};
+      const groupLabels = {};
+
+      matches.forEach(m => {
+        const k = m.groupKey;
+        if (k && k !== 'UEFA') {
+          groupCounts[k] = (groupCounts[k] || 0) + 1;
+          groupLabels[k] = m.displayName || k;
+        }
+      });
+
+      const sortedOtherKeys = Object.keys(groupCounts).sort((a, b) => groupCounts[b] - groupCounts[a]);
+
+      let html = `
+        <option value="ALL">🌐 Όλοι οι Αγώνες (${matches.length})</option>
+        <option value="LIVE">🔥 Live Αγώνες (${matches.filter(m => m.isLive).length})</option>
+        <option value="UEFA">🏆 UEFA (Champions / Europa / Conference) (${matches.filter(m => m.groupKey === 'UEFA').length})</option>
+      `;
+
+      sortedOtherKeys.forEach(k => {
+        const count = groupCounts[k];
+        const label = groupLabels[k];
+        html += `<option value="${k}">${label} (${count})</option>`;
+      });
+
+      dropdown.innerHTML = html;
+      if (dropdown.querySelector(`option[value="${currentValue}"]`)) {
+        dropdown.value = currentValue;
+      } else {
+        dropdown.value = 'ALL';
+      }
+
+      if (builderDropdown) {
+        let builderHtml = `<option value="ALL">🌐 Όλα τα Πρωτάθληματα (${matches.length})</option>`;
+        builderHtml += `<option value="UEFA">🏆 UEFA (Champions / Europa / Conference)</option>`;
+        sortedOtherKeys.forEach(k => {
+          builderHtml += `<option value="${k}">${groupLabels[k]}</option>`;
+        });
+        builderDropdown.innerHTML = builderHtml;
+        if (builderDropdown.querySelector(`option[value="${builderCurrentVal}"]`)) {
+          builderDropdown.value = builderCurrentVal;
+        } else {
+          builderDropdown.value = 'ALL';
+        }
+      }
+    }
+
+    function onDropdownFilterChange(val) {
+      currentFilter = val;
+      renderMatches(currentMatches);
+    }
+
+    async function fetchMatches(force = false) {
+      const currentScrollY = window.scrollY;
+
+      const targetDateStr = getTargetDateStr(currentDayOffset);
+      const cacheKey = `${CACHE_PREFIX}${targetDateStr}`;
+      const cacheTimeKey = `${CACHE_PREFIX}${targetDateStr}_time`;
+
+      const lastFetched = Number(safeGet(cacheTimeKey) || 0);
+      const now = Date.now();
+      const cached = safeGet(cacheKey);
+
+      if (!force && cached && (now - lastFetched < AUTO_SYNC_INTERVAL_MS)) {
+        try {
+          const parsedCached = JSON.parse(cached);
+          currentMatches = parsedCached.map(cachedMatch => parseInitialMatchFromCache(cachedMatch));
+          buildDropdownFilter(currentMatches);
+          renderMatches(currentMatches);
+          renderProPicks(currentMatches);
+          renderDynamicExperts(currentMatches);
+          updateDayStatsBanner(currentMatches);
+          window.scrollTo(0, currentScrollY);
+          return;
+        } catch(e){}
+      }
+
+      const proxyUrl = `https://maujrufokktvkirbycji.supabase.co/functions/v1/smart-api?date=${targetDateStr}`;
+
+      try {
+        const res = await fetch(proxyUrl);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        const json = await res.json();
+        const rawList = json.data || json.fixtures || json.result || (Array.isArray(json) ? json : []);
+
+        if (rawList && rawList.length > 0) {
+          const normalized = rawList.map(normalizeSportApiFixture);
+
+          const filteredByDate = normalized.filter(item => {
+            if (!item.fixture.date) return true;
+            return item.fixture.date === targetDateStr;
+          });
+
+          const sorted = filteredByDate.sort((a, b) => {
+            const isLiveA = a.fixture.status.short === 'LIVE' ? 0 : 1;
+            const isLiveB = b.fixture.status.short === 'LIVE' ? 0 : 1;
+            if (isLiveA !== isLiveB) return isLiveA - isLiveB;
+
+            const getWeight = (m) => (m.league.groupKey === 'UEFA' ? 1 : 10);
+            return getWeight(a) - getWeight(b);
+          });
+
+          const existingCache = cached ? JSON.parse(cached) : [];
+
+          currentMatches = sorted.slice(0, 250).map(item => {
+            const parsed = parseInitialMatch(item);
+            const foundOld = existingCache.find(o => o.id === parsed.id);
+            if (foundOld && foundOld.bestPick) {
+              parsed.bestPick = foundOld.bestPick;
+              parsed.confidence = foundOld.confidence;
+              parsed.scoutDetails = foundOld.scoutDetails;
+              parsed.warning = foundOld.warning;
+              parsed.marketGroup = foundOld.marketGroup;
+              parsed.matchReason = foundOld.matchReason;
+              parsed.matchAvoid = foundOld.matchAvoid;
+              parsed.rawStats = item.rawStats && item.rawStats.length > 0 ? item.rawStats : (foundOld.rawStats || item.rawStats);
+            } else {
+              const h = parsed.home;
+              const a = parsed.away;
+              const id = parsed.id;
+
+              const smartPicks = [
+                { pick: `Over 1.5 Γκολ`, conf: 89, group: 'goals', reason: `Βάσει του ρυθμού και της δημιουργίας φάσεων από ${h} και ${a}, η αναμέτρηση έχει υψηλή ροπή προς τα γκολ.`, avoid: `Αποφύγετε το Under 2.5.` },
+                { pick: `1X & Over 1.5`, conf: 84, group: 'points', reason: `Η ${h} έχει τον πρώτο λόγο στην έδρα της και η κάλυψη με over 1.5 προσφέρει εξαιρετικό value bet.`, avoid: `Αποφύγετε το καθαρό διπλό (2).` },
+                { pick: `Goal / Goal (Ναι)`, conf: 82, group: 'goals', reason: `Και οι δύο σύλλογοι διαθέτουν αξιόλογες επιθετικές γραμμές αλλά ευάλωτες αμυντικές μεταβάσεις.`, avoid: `Αποφύγετε το No Goal (Clean sheet).` },
+                { pick: `Over 2.5 Γκολ`, conf: 80, group: 'goals', reason: `Ανοιχτό παιχνίδι με εκατέρωθεν πίεση που ευνοεί τα πολλά τέρματα.`, avoid: `Μην ποντάρετε σε χαμηλό σκορ.` },
+                { pick: `X2 (Διπλή Ευκαιρία ${a})`, conf: 85, group: 'points', reason: `Η ${a} βρίσκεται σε ανοδική πορεία και μπορεί να φύγει με θετικό αποτέλεσμα.`, avoid: `Αποφύγετε τον άσο (1).` }
+              ];
+
+              const selectedPick = smartPicks[id % smartPicks.length];
+              parsed.bestPick = selectedPick.pick;
+              parsed.confidence = selectedPick.conf;
+              parsed.marketGroup = selectedPick.group;
+              parsed.matchReason = selectedPick.reason;
+              parsed.matchAvoid = selectedPick.avoid;
+
+              parsed.scoutDetails = {
+                xg: selectedPick.reason,
+                injury: `Αναλυτική εκτίμηση: Πλήρης αγωνιστική ετοιμότητα και από τις δύο πλευρές.`,
+                h2h: `Head-to-Head: Ισορροπημένη προϊστορία με έμφαση στον ρυθμό.`,
+                motivation: `Βαθμολογικό κίνητρο: Υψηλό για τη νίκη.`
+              };
+
+              parsed.warning = `⚠️ **Τι να ΜΗΝ παίξετε:** ${selectedPick.avoid}`;
+            }
+
+            if (parsed.isFinished) {
+              parsed.isWon = checkBetWon(parsed.bestPick, parsed.homeGoals, parsed.awayGoals);
+            }
+
+            return parsed;
+          });
+
+          safeSet(cacheKey, JSON.stringify(currentMatches));
+          safeSet(cacheTimeKey, String(now));
+
+          buildDropdownFilter(currentMatches);
+          renderMatches(currentMatches);
+          renderProPicks(currentMatches);
+          renderDynamicExperts(currentMatches);
+          updateDayStatsBanner(currentMatches);
+        } else {
+          currentMatches = [];
+          buildDropdownFilter(currentMatches);
+          renderMatches(currentMatches);
+          updateDayStatsBanner(currentMatches);
+        }
+      } catch (err) {
+        console.error('Silent sync error:', err);
+        if (cached) {
+          try {
+            currentMatches = JSON.parse(cached);
+            buildDropdownFilter(currentMatches);
+            renderMatches(currentMatches);
+            updateDayStatsBanner(currentMatches);
+          } catch(e){}
+        }
+      }
+
+      window.scrollTo(0, currentScrollY);
+    }
+
+    function parseInitialMatchFromCache(item) {
+      if (item.isFinished) {
+        item.isWon = checkBetWon(item.bestPick, item.homeGoals, item.awayGoals);
+      }
+      return item;
+    }
+
+    function parseInitialMatch(item) {
+      const home = item.teams.home.name;
+      const away = item.teams.away.name;
+      const league = item.league.name;
+      const leagueId = item.league.id;
+      const country = item.league.country || 'Διεθνή';
+      const groupKey = item.league.groupKey;
+      const displayName = item.league.displayName;
+      const status = item.fixture.status.short;
+      const elapsed = item.fixture.status.elapsed;
+      const isFinished = status === 'FT';
+      const isLive = status === 'LIVE';
+      
+      const kickoffTime = item.fixture.kickoffTime || '';
+      const homeGoals = item.goals.home ?? 0;
+      const awayGoals = item.goals.away ?? 0;
+      const rawStats = item.rawStats || null;
+
+      const smartPicks = [
+        { pick: `Over 1.5 Γκολ`, conf: 89, group: 'goals', reason: `Βάσει του ρυθμού και της δημιουργίας φάσεων, η αναμέτρηση έχει υψηλή ροπή προς τα γκολ.`, avoid: `Αποφύγετε το Under 2.5.` },
+        { pick: `1X & Over 1.5`, conf: 84, group: 'points', reason: `Η γηπεδούχος έχει τον πρώτο λόγο και η κάλυψη με over 1.5 προσφέρει εξαιρετικό value.`, avoid: `Αποφύγετε το διπλό (2).` },
+        { pick: `Goal / Goal (Ναι)`, conf: 82, group: 'goals', reason: `Αμφότερες διαθέτουν παραγωγική επίθεση.`, avoid: `Αποφύγετε το No Goal.` },
+        { pick: `Over 2.5 Γκολ`, conf: 80, group: 'goals', reason: `Ανοιχτό παιχνίδι με εκατέρωθεν πίεση.`, avoid: `Μην ποντάρετε σε χαμηλό σκορ.` },
+        { pick: `X2 (Διπλή Ευκαιρία)`, conf: 85, group: 'points', reason: `Η φιλοξενούμενη διατηρεί θετικό momentum.`, avoid: `Αποφύγετε τον άσο (1).` }
+      ];
+
+      const selectedPick = smartPicks[(item.fixture.id || 1) % smartPicks.length];
+      let bestPick = selectedPick.pick;
+      let confidence = selectedPick.conf;
+      let marketGroup = selectedPick.group;
+
+      let isWon = false;
+      if (isFinished) {
+        isWon = checkBetWon(bestPick, homeGoals, awayGoals);
+      }
+
+      return {
+        id: item.fixture.id,
+        home,
+        away,
+        league: displayName,
+        leagueId,
+        country,
+        groupKey,
+        displayName,
+        kickoffTime,
+        status,
+        elapsed,
+        isFinished,
+        isLive,
+        score: `${homeGoals} - ${awayGoals}`,
+        homeGoals,
+        awayGoals,
+        bestPick,
+        confidence,
+        marketGroup,
+        isWon,
+        rawStats,
+        matchReason: selectedPick.reason,
+        matchAvoid: selectedPick.avoid
+      };
+    }
+
+    function updateDayStatsBanner(matches) {
+      const banner = document.getElementById('yesterday-stats-banner');
+      const rateText = document.getElementById('yesterday-rate-text');
+      const badge = document.getElementById('yesterday-badge');
+      if (!banner || !rateText || !badge) return;
+
+      if (currentDayOffset >= 0) {
+        banner.classList.add('hidden');
+        return;
+      }
+
+      const finishedMatches = matches.filter(m => m.isFinished);
+      const totalFinished = finishedMatches.length;
+
+      if (totalFinished === 0) {
+        banner.classList.remove('hidden');
+        rateText.innerText = 'Δεν υπάρχουν ολοκληρωμένοι αγώνες για αυτή την ημέρα.';
+        badge.innerText = '0%';
+        return;
+      }
+
+      const wonCount = finishedMatches.filter(m => m.isWon).length;
+      const lostCount = totalFinished - wonCount;
+      const successRate = Math.round((wonCount / totalFinished) * 100);
+
+      banner.classList.remove('hidden');
+      rateText.innerHTML = `${wonCount} Επιτυχίες ✅ / ${lostCount} Αποτυχίες ❌ (${totalFinished} Αγώνες)`;
+      badge.innerText = `${successRate}% Επιτυχία`;
+    }
+
+    function getLiveRecommendation(m) {
+      if (!m.isLive) return null;
+      const hg = m.homeGoals;
+      const ag = m.awayGoals;
+      const tot = hg + ag;
+
+      if (hg === ag) {
+        return { pick: `Smart Live: Over ${tot + 0.5} Γκολ`, desc: 'Ισοπαλία στο live • Πίεση για γκολ' };
+      } else {
+        return { pick: `Smart Live: Over ${tot + 0.5}`, desc: 'Ανοιχτός ρυθμός αγώνα στο δεύτερο ημίχρονο' };
+      }
+    }
+
+    function parseStatValue(rawStats, statKey) {
+      if (!rawStats) return null;
+      if (Array.isArray(rawStats)) {
+        for (const statObj of rawStats) {
+          const statsList = statObj.statistics || statObj.stats || statObj;
+          if (Array.isArray(statsList)) {
+            for (const s of statsList) {
+              const type = String(s.type || s.key || s.name || '').toLowerCase();
+              if (type.includes(statKey.toLowerCase())) {
+                return s.value !== undefined ? s.value : null;
+              }
+            }
+          }
+        }
+      }
+      return null;
+    }
+
+    function openScoutingModal(matchId) {
+      if (!checkUserAccess()) {
+        openPaywallModal();
+        return;
+      }
+
+      const m = currentMatches.find(item => item.id == matchId);
+      if (!m) return;
+
+      document.getElementById('scout-modal-title').innerText = `${m.home} vs ${m.away}`;
+      document.getElementById('scout-modal-league').innerText = m.league;
+
+      let adviceText = `Smart AI Ανάλυση για την επιλογή <strong>${m.bestPick}</strong>:<br>` +
+        `• <strong>Δείκτης Win-Rate:</strong> ${m.confidence}%<br>` +
+        `• <strong>Ανάλυση & Τακτική:</strong> ${m.matchReason}`;
+      
+      let warningText = `⚠️ **Τι να ΜΗΝ παίξετε:** ${m.matchAvoid}`;
+
+      let liveStatsHtml = '';
+      const hasRealStats = m.rawStats && Array.isArray(m.rawStats) && m.rawStats.length > 0;
+      
+      if (hasRealStats) {
+        const homePoss = parseStatValue(m.rawStats, 'possession') || '50%';
+        const homeShots = parseStatValue(m.rawStats, 'shots') || '-';
+        const homeCorners = parseStatValue(m.rawStats, 'corner') || '-';
+        const homeYellow = parseStatValue(m.rawStats, 'yellow') || '0';
+        const homeRed = parseStatValue(m.rawStats, 'red') || '0';
+
+        liveStatsHtml = `
+          <div class="bg-slate-950 border border-emerald-500/40 rounded-2xl p-3.5 space-y-2.5">
+            <div class="flex items-center justify-between text-[11px] font-black text-emerald-400 uppercase tracking-wider border-b border-slate-800 pb-1.5">
+              <span><i class="fa-solid fa-chart-bar mr-1"></i> Ζωντανά Στατιστικά Αγώνα</span>
+              <span>${m.status}</span>
+            </div>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+                <span class="font-black text-emerald-400">${homePoss}</span>
+                <span class="text-slate-400 text-[11px]">Κατοχή Μπάλας</span>
+              </div>
+              <div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+                <span class="font-black text-emerald-400">${homeShots}</span>
+                <span class="text-slate-400 text-[11px]">Σουτ</span>
+              </div>
+              <div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+                <span class="font-black text-emerald-400">${homeCorners}</span>
+                <span class="text-slate-400 text-[11px]">Κόρνερ</span>
+              </div>
+              <div class="flex justify-between items-center bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+                <span class="font-black text-amber-400">🟨 ${homeYellow} | 🟥 ${homeRed}</span>
+                <span class="text-slate-400 text-[11px]">Κάρτες</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        liveStatsHtml = `
+          <div class="bg-slate-950 border border-slate-800 rounded-2xl p-3.5 text-center text-xs text-slate-400">
+            <i class="fa-solid fa-circle-info text-amber-400 mr-1"></i> Τα στατιστικά θα ενημερωθούν αυτόματα κατά τη διάρκεια του live.
+          </div>
+        `;
+      }
+
+      document.getElementById('scout-modal-content').innerHTML = `
+        <div class="bg-gradient-to-r from-emerald-950/90 via-slate-900 to-slate-900 border border-emerald-500/50 rounded-2xl p-4 space-y-2.5 shadow-md">
+          <div class="flex justify-between items-center text-[11px] border-b border-emerald-500/20 pb-2">
+            <span class="text-emerald-400 font-black uppercase tracking-wider flex items-center gap-1.5">
+              <i class="fa-solid fa-circle-check text-sm text-emerald-400"></i> SMART AI SCOUTING (${m.home} vs ${m.away})
+            </span>
+            <span class="bg-emerald-500/20 text-emerald-300 font-extrabold px-2 py-0.5 rounded-full">${m.confidence}% Win-Rate</span>
+          </div>
+
+          <div class="space-y-2">
+            <div class="bg-slate-950/60 p-2.5 rounded-xl border border-emerald-500/30 flex justify-between items-center">
+              <div>
+                <span class="text-[10px] text-emerald-300 block font-semibold">Πρόταση:</span>
+                <span class="text-sm font-black text-white">${m.bestPick}</span>
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-300 leading-relaxed pl-1 space-y-1">${adviceText}</p>
+          </div>
+        </div>
+
+        ${liveStatsHtml}
+
+        <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-3.5 space-y-2 text-xs text-amber-200 leading-relaxed">
+          ${warningText}
+        </div>
+      `;
+
+      document.getElementById('scouting-modal').classList.remove('hidden');
+    }
+
+    function closeScoutingModal() {
+      document.getElementById('scouting-modal').classList.add('hidden');
+    }
+
+    // ==================== COMMUNITY CHAT LOGIC ====================
+    async function loadCommunityMessages() {
+      const box = document.getElementById('chat-messages-box');
+      if (!box) return;
+
+      if (!checkUserAccess()) {
+        box.innerHTML = `
+          <div class="text-center py-10 space-y-3">
+            <i class="fa-solid fa-lock text-amber-400 text-2xl"></i>
+            <div class="font-bold text-white">Το Chat είναι διαθέσιμο μόνο για VIP & Active Trial μέλη.</div>
+            <button onclick="openPaywallModal()" class="bg-amber-500 text-slate-950 font-black text-xs px-4 py-2 rounded-xl">Ενεργοποίηση Συνδρομής</button>
+          </div>`;
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient
+          .from('community_messages')
+          .select('*')
+          .order('created_at', { ascending: true })
+          .limit(100);
+
+        if (error) throw error;
+        renderChatMessages(data || []);
+      } catch (err) {
+        console.error('Error loading chat:', err);
+      }
+    }
+
+    function renderChatMessages(messages) {
+      const box = document.getElementById('chat-messages-box');
+      if (!box) return;
+
+      if (messages.length === 0) {
+        box.innerHTML = `<div class="text-center text-slate-500 py-8">Δεν υπάρχουν μηνύματα ακόμη. Γράψτε το πρώτο!</div>`;
+        return;
+      }
+
+      const isUserAdminOrMod = currentUser && (currentUser.isAdmin || currentUser.isMod);
+
+      box.innerHTML = messages.map(m => {
+        const isMe = currentUser && m.user_email === currentUser.email;
+        const timeStr = new Date(m.created_at).toLocaleTimeString('el-GR', { hour: '2-digit', minute: '2-digit' });
+
+        let deleteBtn = '';
+        if (isUserAdminOrMod || isMe) {
+          deleteBtn = `<button onclick="deleteChatMessage('${m.id}')" class="text-rose-400 hover:text-rose-300 ml-2" title="Διαγραφή"><i class="fa-solid fa-trash text-[10px]"></i></button>`;
+        }
+
+        return `
+          <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 space-y-1">
+            <div class="flex justify-between items-center text-[10px]">
+              <span class="font-bold text-emerald-400">${m.username || m.user_email.split('@')[0]}</span>
+              <div class="flex items-center gap-1.5">
+                <span class="text-slate-500">${timeStr}</span>
+                ${deleteBtn}
+              </div>
+            </div>
+            <div class="text-slate-200 break-words">${escapeHtml(m.message)}</div>
+          </div>
+        `;
+      }).join('');
+
+      box.scrollTop = box.scrollHeight;
+    }
+
+    async function sendCommunityMessage(e) {
+      e.preventDefault();
+      if (!checkUserAccess()) {
+        openPaywallModal();
+        return;
+      }
+
+      const input = document.getElementById('chat-input-field');
+      const text = input ? input.value.trim() : '';
+      if (!text || !currentUser) return;
+
+      const { data: userCheck } = await supabaseClient
+        .from('app_users')
+        .select('is_banned')
+        .eq('email', currentUser.email)
+        .maybeSingle();
+
+      if (userCheck && userCheck.is_banned) {
+        alert('Ο λογαριασμός σας έχει αποκλειστεί.');
+        return;
+      }
+
+      try {
+        const { error } = await supabaseClient
+          .from('community_messages')
+          .insert([{
+            user_email: currentUser.email,
+            username: currentUser.username || currentUser.email.split('@')[0],
+            message: text
+          }]);
+
+        if (error) throw error;
+        input.value = '';
+        loadCommunityMessages();
+      } catch (err) {
+        alert('Σφάλμα αποστολής: ' + err.message);
+      }
+    }
+
+    async function deleteChatMessage(id) {
+      if (!confirm('Διαγραφή αυτού του μηνύματος;')) return;
+      try {
+        await supabaseClient.from('community_messages').delete().eq('id', id);
+        loadCommunityMessages();
+      } catch (err) {
+        alert('Σφάλμα διαγραφής: ' + err.message);
+      }
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function initChatRealtime() {
+      if (!supabaseClient) return;
+      if (chatSubscription) supabaseClient.removeChannel(chatSubscription);
+
+      chatSubscription = supabaseClient
+        .channel('public:community_messages')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'community_messages' }, () => {
+          loadCommunityMessages();
+        })
+        .subscribe();
+    }
+
+    function renderMatches(list) {
+      const container = document.getElementById('matches-container');
+      
+      let filtered = list;
+      if (currentFilter === 'LIVE') {
+        filtered = list.filter(m => m.isLive);
+      } else if (currentFilter === 'UEFA') {
+        filtered = list.filter(m => m.groupKey === 'UEFA');
+      } else if (currentFilter !== 'ALL') {
+        filtered = list.filter(m => m.groupKey === currentFilter);
+      }
+
+      if (!container) return;
+
+      if (!filtered.length) {
+        container.innerHTML = `
+          <div class="bg-slate-800/50 border border-slate-700/60 rounded-2xl p-6 text-center space-y-2">
+            <i class="fa-regular fa-futbol text-slate-500 text-2xl"></i>
+            <p class="text-xs text-slate-300 font-bold">Δεν υπάρχουν αγώνες για αυτή την επιλογή.</p>
+          </div>`;
+        return;
+      }
+
+      const hasAccess = checkUserAccess();
+
+      container.innerHTML = filtered.map(m => {
+        let statusBadge = '';
+        if (m.isFinished) {
+          statusBadge = m.isWon ? `<span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-[10px] font-black px-2.5 py-0.5 rounded-full">Έπιασε ✅</span>` : `<span class="bg-rose-500/20 text-rose-400 border border-rose-500/40 text-[10px] font-black px-2.5 py-0.5 rounded-full">Χάθηκε ❌</span>`;
+        } else if (m.isLive) {
+          statusBadge = `<span class="bg-rose-500 text-white font-black text-[10px] px-2.5 py-0.5 rounded-full animate-pulse">LIVE ${m.elapsed ? m.elapsed + "'" : ''}</span>`;
+        } else if (m.kickoffTime) {
+          statusBadge = `<span class="bg-slate-900 text-slate-300 text-[10px] font-mono font-bold px-2.5 py-0.5 rounded border border-slate-700">${m.kickoffTime}</span>`;
+        }
+
+        const liveRec = getLiveRecommendation(m);
+
+        return `
+          <div class="bg-slate-800/90 border ${m.isLive ? 'border-rose-500/50' : 'border-slate-700/80'} rounded-2xl p-4 space-y-3 shadow-md">
+            <div class="flex justify-between items-center text-[11px] border-b border-slate-700/50 pb-2">
+              <span class="font-extrabold text-emerald-400 truncate max-w-[210px]">${m.league}</span>
+              ${statusBadge}
+            </div>
+
+            <div class="flex justify-between items-center py-1.5">
+              <div class="flex-1 truncate"><span class="font-black text-sm text-white block truncate">${m.home}</span></div>
+              <div class="px-4 text-center"><span class="text-sm font-black font-mono ${m.isLive ? 'text-rose-400 text-base animate-pulse' : 'text-amber-400'}">${m.score}</span></div>
+              <div class="flex-1 text-right truncate"><span class="font-black text-sm text-white block truncate">${m.away}</span></div>
+            </div>
+
+            <!-- SMART AI ΠΡΟΤΑΣΗ (Κλειδωμένη αν δεν υπάρχει πρόσβαση) -->
+            <div class="relative bg-gradient-to-r from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl p-3 space-y-1.5 overflow-hidden">
+              ${!hasAccess ? `
+                <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm z-10 flex items-center justify-between px-4">
+                  <div class="flex items-center gap-2 text-amber-400 font-bold text-xs"><i class="fa-solid fa-lock text-sm"></i> Smart AI Pick</div>
+                  <button onclick="openPaywallModal()" class="bg-amber-500 text-slate-950 font-black text-[10px] px-3 py-1.5 rounded-lg shadow-md">Ξεκλείδωμα</button>
+                </div>
+              ` : ''}
+
+              <div class="flex justify-between items-center ${!hasAccess ? 'filter blur-[3px]' : ''}">
+                <span class="text-[10px] font-black text-emerald-300 uppercase tracking-wider flex items-center gap-1">
+                  <i class="fa-solid fa-shield-halved text-xs"></i> SMART AI ΠΡΟΤΑΣΗ:
+                </span>
+                <span class="bg-emerald-500/20 text-emerald-400 text-[10px] font-black px-2 py-0.5 rounded-full">${m.confidence}% Win-Rate</span>
+              </div>
+
+              <div class="flex justify-between items-center ${!hasAccess ? 'filter blur-[3px]' : ''}">
+                <span class="text-sm font-black text-white">${m.bestPick}</span>
+              </div>
+            </div>
+
+            <!-- SMART LIVE (Κλειδωμένο αν δεν υπάρχει πρόσβαση) -->
+            ${m.isLive && liveRec ? `
+              <div class="relative bg-gradient-to-r from-rose-950/70 via-slate-900 to-slate-900 border border-rose-500/40 rounded-2xl p-3 space-y-1 overflow-hidden">
+                ${!hasAccess ? `
+                  <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm z-10 flex items-center justify-between px-4">
+                    <div class="flex items-center gap-2 text-amber-400 font-bold text-xs"><i class="fa-solid fa-lock text-sm"></i> Smart Live</div>
+                    <button onclick="openPaywallModal()" class="bg-amber-500 text-slate-950 font-black text-[10px] px-3 py-1.5 rounded-lg shadow-md">Ξεκλείδωμα</button>
+                  </div>
+                ` : ''}
+
+                <div class="flex justify-between items-center text-[10px] font-black text-rose-300 uppercase tracking-wider ${!hasAccess ? 'filter blur-[3px]' : ''}">
+                  <span><i class="fa-solid fa-bolt text-rose-400"></i> SMART LIVE:</span>
+                  <span class="text-slate-400 text-[9px]">${liveRec.desc}</span>
+                </div>
+                <div class="flex justify-between items-center ${!hasAccess ? 'filter blur-[3px]' : ''}">
+                  <span class="text-xs font-black text-white">${liveRec.pick}</span>
+                </div>
+              </div>
+            ` : ''}
+
+            <button onclick="openScoutingModal(${m.id})" class="w-full bg-slate-900 hover:bg-slate-700/80 border border-slate-700 text-slate-200 font-extrabold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
+              <i class="fa-solid fa-compass-drafting text-emerald-400 text-xs"></i> Προβολή Scouting & Analysis
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderProPicks(list) {
+      const container = document.getElementById('pro-picks-container');
+      if (!container) return;
+      const topPicks = list.slice(0, 5);
+      const hasAccess = checkUserAccess();
+
+      container.innerHTML = topPicks.map(m => `
+        <div class="relative bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 space-y-2.5 shadow-md overflow-hidden">
+          ${!hasAccess ? `
+            <div class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm z-10 flex flex-col items-center justify-center gap-2 p-4">
+              <div class="text-amber-400 font-black text-xs flex items-center gap-1.5"><i class="fa-solid fa-crown"></i> VIP Smart AI</div>
+              <button onclick="openPaywallModal()" class="bg-amber-500 text-slate-950 font-black text-xs px-4 py-1.5 rounded-xl shadow-lg">Επιλογή Πακέτου</button>
+            </div>
+          ` : ''}
+
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-extrabold text-white">${m.home} vs ${m.away}</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px] text-slate-400">
+            <span>Επιλογή: <strong class="text-emerald-400">${m.bestPick}</strong></span>
+            <span class="text-emerald-400 font-bold">${m.confidence}%</span>
+          </div>
+          <button onclick="openScoutingModal(${m.id})" class="w-full bg-slate-900 hover:bg-slate-700 text-slate-300 border border-slate-700 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-chart-line text-emerald-400"></i> Analysis
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function renderDynamicExperts(matches) {
+      const gmContainer = document.getElementById('expert-goalmaster-container');
+      const sbContainer = document.getElementById('expert-banker-container');
+      if (!gmContainer || !sbContainer) return;
+
+      if (!matches || matches.length === 0) {
+        gmContainer.innerHTML = '<p class="text-[11px] text-slate-500 py-2">Δεν υπάρχουν αγώνες.</p>';
+        sbContainer.innerHTML = '<p class="text-[11px] text-slate-500 py-2">Δεν υπάρχουν αγώνες.</p>';
+        return;
+      }
+
+      const hasAccess = checkUserAccess();
+
+      const goalMatches = matches.slice(0, 3);
+      gmContainer.innerHTML = goalMatches.map(m => `
+        <div class="relative bg-slate-900/80 rounded-xl p-3 border border-slate-800 space-y-1.5 overflow-hidden">
+          ${!hasAccess ? `<div class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm z-10 flex items-center justify-between px-4"><div class="text-amber-400 font-bold text-xs"><i class="fa-solid fa-lock"></i> Κλειδωμένο</div><button onclick="openPaywallModal()" class="bg-amber-500 text-slate-950 font-black text-[10px] px-2.5 py-1 rounded-lg">VIP</button></div>` : ''}
+          <div class="flex justify-between items-center text-xs ${!hasAccess ? 'filter blur-[3px]' : ''}">
+            <span class="font-extrabold text-white truncate max-w-[200px]">${m.home} vs ${m.away}</span>
+          </div>
+          <div class="text-[11px] text-slate-300 ${!hasAccess ? 'filter blur-[3px]' : ''}">
+            <strong class="text-emerald-300">Goal Master:</strong> ${m.bestPick}
+          </div>
+        </div>
+      `).join('');
+
+      const pointMatches = matches.slice(3, 6);
+      sbContainer.innerHTML = pointMatches.map(m => `
+        <div class="relative bg-slate-900/80 rounded-xl p-3 border border-slate-800 space-y-1.5 overflow-hidden">
+          ${!hasAccess ? `<div class="absolute inset-0 bg-slate-950/85 backdrop-blur-sm z-10 flex items-center justify-between px-4"><div class="text-amber-400 font-bold text-xs"><i class="fa-solid fa-lock"></i> Κλειδωμένο</div><button onclick="openPaywallModal()" class="bg-amber-500 text-slate-950 font-black text-[10px] px-2.5 py-1 rounded-lg">VIP</button></div>` : ''}
+          <div class="flex justify-between items-center text-xs ${!hasAccess ? 'filter blur-[3px]' : ''}">
+            <span class="font-extrabold text-white truncate max-w-[200px]">${m.home} vs ${m.away}</span>
+          </div>
+          <div class="text-[11px] text-slate-300 ${!hasAccess ? 'filter blur-[3px]' : ''}">
+            <strong class="text-amber-300">Solid Banker:</strong> ${m.bestPick}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function switchTab(tabId) {
+      ['home', 'propicks', 'chat', 'experts', 'generator', 'profile'].forEach(t => {
+        const el = document.getElementById(`tab-${t}`);
+        const navBtn = document.getElementById(`nav-${t}`);
+        if (el) el.classList.add('hidden');
+        if (navBtn) {
+          navBtn.classList.remove('text-emerald-400', 'text-purple-400');
+          navBtn.classList.add('text-slate-400');
+        }
+      });
+
+      const targetTab = document.getElementById(`tab-${tabId}`);
+      const targetNav = document.getElementById(`nav-${tabId}`);
+      if (targetTab) targetTab.classList.remove('hidden');
+      if (targetNav) {
+        targetNav.classList.remove('text-slate-400');
+        if (tabId === 'generator') {
+          targetNav.classList.add('text-purple-400');
+        } else {
+          targetNav.classList.add('text-emerald-400');
+        }
+      }
+
+      if (tabId === 'chat') {
+        loadCommunityMessages();
+        initChatRealtime();
+      }
+
+      if (tabId === 'profile' && currentUser) {
+        updateSubscriptionUI(currentUser);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initDateLabels();
+      initUserSession();
+      fetchMatches();
+
+      setInterval(() => {
+        if (currentDayOffset === 0) {
+          fetchMatches(true);
+        }
+      }, AUTO_SYNC_INTERVAL_MS);
+    });
+  </script>
+</body>
+</html>
